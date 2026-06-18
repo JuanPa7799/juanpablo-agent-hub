@@ -195,7 +195,7 @@
 
                 <div id="login-error"
                     class="hidden text-red-400 text-xs text-center font-medium bg-red-900/20 border border-red-900/50 py-2 rounded-lg">
-                    Credenciales incorrectas. Intenta de nuevo.
+                    No se pudo iniciar sesion. Intenta de nuevo.
                 </div>
 
                 <button type="submit"
@@ -701,20 +701,46 @@
         // --- SISTEMA DE LOGIN ---
         async function apiFetch(path, options = {}) {
             const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
-            const response = await fetch(`${API_BASE}${path}`, {
-                credentials: 'include',
-                ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(sessionToken ? { 'X-Session-Token': sessionToken } : {}),
-                    ...(options.headers || {})
-                }
-            });
+            let response;
+            try {
+                response = await fetch(`${API_BASE}${path}`, {
+                    credentials: 'include',
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(sessionToken ? { 'X-Session-Token': sessionToken } : {}),
+                        ...(options.headers || {})
+                    }
+                });
+            } catch (networkError) {
+                networkError.isNetworkError = true;
+                throw networkError;
+            }
             if (!response.ok) {
                 const text = await response.text();
-                throw new Error(text || `HTTP ${response.status}`);
+                let detail = text;
+                try {
+                    const parsed = JSON.parse(text);
+                    detail = parsed.detail || parsed.message || text;
+                } catch (_) { }
+                const error = new Error(detail || `HTTP ${response.status}`);
+                error.status = response.status;
+                throw error;
             }
             return response.json();
+        }
+
+        function loginErrorMessage(error) {
+            if (error?.isNetworkError || error instanceof TypeError) {
+                return `No se puede conectar con la API Jetson (${API_BASE || 'misma URL'}). Revisa que Cloudflare este activo o espera a que GitHub Pages actualice la URL.`;
+            }
+            if (error?.status === 401) {
+                return 'Credenciales incorrectas. Revisa usuario y contrasena.';
+            }
+            if (error?.status) {
+                return `La API respondio con error ${error.status}. Intenta de nuevo en un momento.`;
+            }
+            return 'No se pudo iniciar sesion. Intenta de nuevo.';
         }
 
         async function checkLoginStatus() {
@@ -761,6 +787,7 @@
                 errorDiv.classList.add('hidden');
                 checkLoginStatus();
             } catch (e) {
+                errorDiv.textContent = loginErrorMessage(e);
                 errorDiv.classList.remove('hidden');
             }
         }

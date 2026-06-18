@@ -77,7 +77,7 @@ tunnel_healthy() {
 
 start_cloudflared() {
   log "Starting cloudflared temporary tunnel"
-  pkill -f "cloudflared tunnel --url $API_URL" >/dev/null 2>&1 || true
+  pkill cloudflared >/dev/null 2>&1 || true
   : > "$CF_LOG"
   nohup cloudflared tunnel --url "$API_URL" > "$CF_LOG" 2>&1 &
   echo "$!" > "$CF_PID"
