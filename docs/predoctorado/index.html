@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espacio de Trabajo - Protocolo Predoctoral</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#2563eb',
+                            purple: '#9333ea',
+                            dark: '#0f172a',
+                            darker: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="../config.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+
+        .sidebar-transition {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #3b82f6, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animación de experiencia */
+        @keyframes xpPop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                color: #22c55e;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .xp-gain {
+            animation: xpPop 0.5s ease;
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-brand-darker text-slate-800 dark:text-slate-200 font-sans h-screen flex overflow-hidden transition-colors duration-300 relative">
+
+    <!-- PANTALLA DE LOGIN (OVERLAY) -->
+    <div id="login-overlay"
+        class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center transition-opacity duration-500">
+        <!-- Elementos decorativos de fondo -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div
+                class="absolute -top-40 -right-40 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse">
+            </div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"
+                style="animation-delay: 2s;"></div>
+        </div>
+
+        <div
+            class="relative z-10 bg-slate-800/80 backdrop-blur-xl border border-slate-700 p-10 rounded-[2rem] shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <div
+                    class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform rotate-3">
+                    <i class="ph-bold ph-lock-key text-3xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Acceso Restringido</h2>
+                <p class="text-sm text-slate-400 mt-2">Espacio de Trabajo Predoctoral - IA Activa</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Usuario</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="ph-fill ph-user text-slate-500"></i>
+                        </div>
+                        <input type="text" id="login-user" required autocomplete="username"
+                            class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder-slate-600"
+                            placeholder="Ingresa tu usuario">
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Contraseña</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="ph-fill ph-password text-slate-500"></i>
+                        </div>
+                        <input type="password" id="login-pass" required autocomplete="current-password"
+                            class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder-slate-600"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div id="login-error"
+                    class="hidden text-red-400 text-xs text-center font-medium bg-red-900/20 border border-red-900/50 py-2 rounded-lg">
+                    Credenciales incorrectas. Intenta de nuevo.
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    Ingresar al Sistema <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </form>
+            <div class="mt-6 text-center">
+                <p class="text-[10px] text-slate-500">Protección de consumo de API activa. ITM 2026.</p>
+            </div>
+        </div>
+    </div>
+    <!-- FIN PANTALLA DE LOGIN -->
+
+
+    <!-- Sidebar Navegación Principal -->
+    <nav
+        class="w-64 glass-panel flex flex-col flex-shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-20 relative">
+        <div class="p-6 border-b border-slate-100 dark:border-slate-800">
+            <h1 class="text-xl font-bold flex items-center gap-2 tracking-tight">
+                <i class="ph-fill ph-graduation-cap text-2xl text-blue-600 dark:text-blue-400"></i>
+                <span class="gradient-text">Predoctorado</span>
+            </h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Investigación SBC & PQD</p>
+        </div>
+
+        <div class="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
+            <button onclick="switchTab('inicio')" id="btn-inicio"
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300 shadow-sm">
+                <i class="ph ph-house text-xl"></i> Panel de Inicio
+            </button>
+
+            <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 mt-4 px-2">
+                Estructura</div>
+            <button onclick="switchTab('plan')" id="btn-plan"
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <i class="ph ph-calendar-check text-xl"></i> Plan de Trabajo
+            </button>
+            <button onclick="switchTab('checklist')" id="btn-checklist"
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <i class="ph ph-list-checks text-xl"></i> Análisis de Papers
+            </button>
+            <button onclick="switchTab('plantilla')" id="btn-plantilla"
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <i class="ph ph-file-text text-xl"></i> Editor de Protocolo
+            </button>
+
+            <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 mt-4 px-2">
+                Productividad Base</div>
+            <button onclick="switchTab('productividad')" id="btn-productividad"
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <i class="ph ph-brain text-xl"></i> Enfoque & Tareas
+            </button>
+            <button onclick="switchTab('bitacora')" id="btn-bitacora"
+                class="nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                <i class="ph ph-notebook text-xl"></i> Archivo & Bitácora
+            </button>
+        </div>
+
+        <!-- Gamificación y Perfil bottom -->
+        <div
+            class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-brand-dark/50 flex flex-col gap-4">
+
+            <!-- Barra de XP -->
+            <div class="px-2">
+                <div class="flex justify-between items-end mb-1">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Nivel <span id="user-level"
+                            class="text-blue-600 dark:text-blue-400">1</span></span>
+                    <span id="user-xp" class="text-[10px] font-mono text-slate-400">0/100 XP</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div id="xp-bar"
+                        class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+                        style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <button onclick="toggleTheme()"
+                class="flex items-center gap-3 px-2 py-1 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors w-full">
+                <i id="theme-icon" class="ph-fill ph-moon text-xl"></i> <span id="theme-text">Modo Oscuro</span>
+            </button>
+            <div class="flex items-center gap-3 px-2">
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                    JP
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">Juan Pablo G.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Investigador</p>
+                </div>
+                <button onclick="logout()" class="ml-auto text-slate-400 hover:text-red-500 transition-colors"
+                    title="Cerrar Sesión">
+                    <i class="ph-bold ph-sign-out"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Área Principal -->
+    <main class="flex-1 flex flex-col relative bg-[#f8fafc] dark:bg-slate-900/50 overflow-hidden">
+
+        <!-- Header superior -->
+        <header
+            class="h-16 glass-panel flex items-center justify-between px-8 z-10 border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm">
+            <h2 id="current-tab-title" class="text-lg font-semibold text-slate-800 dark:text-slate-200">Panel de Inicio
+            </h2>
+            <div class="flex items-center gap-4">
+                <span id="save-status"
+                    class="text-xs text-green-600 dark:text-green-400 font-medium opacity-0 transition-opacity">Guardado
+                    automático</span>
+                <button onclick="toggleAssistant()"
+                    class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <i class="ph ph-sparkle"></i> IA Asistente
+                </button>
+            </div>
+        </header>
+
+        <!-- Contenido scrollable -->
+        <div class="flex-1 overflow-y-auto p-8 relative">
+            <div class="max-w-6xl mx-auto pb-12">
+
+                <!-- Tab 0: INICIO -->
+                <div id="tab-inicio" class="tab-content active">
+                    <div
+                        class="p-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-[2rem] text-white shadow-xl mb-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 -mt-10 -mr-10 opacity-20">
+                            <i class="ph-fill ph-brain text-[20rem]"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <h2 class="text-4xl font-extrabold mb-3 tracking-tight">Sistema Activo y Potenciado por IA.
+                            </h2>
+                            <p class="text-blue-100 text-lg mb-6 max-w-2xl leading-relaxed">
+                                Tu entorno ahora cuenta con <strong>integraciones de Inteligencia Artificial</strong> y
+                                protección por contraseña. Puedes analizar artículos, mejorar tu redacción académica y
+                                desglosar tareas complejas con un solo clic en el icono ✨.
+                            </p>
+                            <div class="flex gap-4">
+                                <button onclick="aiPlanearDia()"
+                                    class="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl backdrop-blur-md transition-all font-semibold flex items-center gap-2 border border-white/30">
+                                    <i class="ph-fill ph-magic-wand"></i> Sugerir enfoque de hoy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <h3
+                                class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
+                                <i class="ph-fill ph-check-circle text-blue-500"></i> Misiones del Día
+                            </h3>
+                            <div id="dashboard-tasks" class="space-y-3"></div>
+                            <button onclick="switchTab('productividad')"
+                                class="mt-4 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline w-full text-center">Ir
+                                al gestor de tareas</button>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <h3
+                                class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                                <i class="ph-fill ph-sparkle text-purple-500"></i> Herramientas de IA
+                            </h3>
+                            <ul class="space-y-4 text-sm text-slate-600 dark:text-slate-400">
+                                <li class="flex items-start gap-3">
+                                    <div
+                                        class="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 dark:text-purple-400">
+                                        <i class="ph-bold ph-magnifying-glass"></i></div>
+                                    <div><strong>Analizador de Abstracts:</strong> Pega el resumen de un paper y la IA
+                                        te dirá si sirve para tu tesis. (En Pestaña <i>Análisis de Papers</i>)</div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div
+                                        class="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                        <i class="ph-bold ph-pencil-simple"></i></div>
+                                    <div><strong>Pulidor Académico:</strong> Mejora al instante tus textos en el
+                                        borrador del protocolo. (En Pestaña <i>Editor de Protocolo</i>)</div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div
+                                        class="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg text-blue-600 dark:text-blue-400">
+                                        <i class="ph-bold ph-arrows-split"></i></div>
+                                    <div><strong>Desglose de Tareas:</strong> Divide tareas complejas en pasos pequeños.
+                                        (En Pestaña <i>Enfoque & Tareas</i>)</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 1: Plan de Trabajo -->
+                <div id="tab-plan" class="tab-content">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Plan de Trabajo (4 Semanas)
+                        </h2>
+                        <p class="text-slate-600 dark:text-slate-400">Marca las casillas conforme avances. El progreso
+                            se guarda automáticamente.</p>
+                    </div>
+                    <div id="plan-container" class="space-y-6"></div>
+                </div>
+
+                <!-- Tab 1.5: Checklist y Analizador IA -->
+                <div id="tab-checklist" class="tab-content">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Filtro de Estado del Arte
+                        </h2>
+                        <p class="text-slate-600 dark:text-slate-400">Usa la IA para evaluar rápidamente un artículo, o
+                            marca los criterios manualmente.</p>
+                    </div>
+
+                    <!-- HERRAMIENTA IA: Analizador de Abstracts -->
+                    <div
+                        class="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-3xl p-8 shadow-md mb-8 text-white relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 opacity-10 pointer-events-none">
+                            <i class="ph-fill ph-brain text-[15rem]"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2 flex items-center gap-2 relative z-10"><i
+                                class="ph-fill ph-sparkle"></i> IA: Analizador de Artículos</h3>
+                        <p class="text-purple-100 text-sm mb-5 max-w-3xl relative z-10">Pega el abstract o las
+                            conclusiones de un paper. La IA verificará si cumple con tus criterios de investigación (PQD
+                            complejas, Edge Computing, etc.).</p>
+
+                        <div class="relative z-10">
+                            <textarea id="abstract-input"
+                                class="w-full h-28 p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 mb-4 text-sm resize-y shadow-inner"
+                                placeholder="Pega el texto científico aquí..."></textarea>
+                            <button onclick="aiAnalizarAbstract()" id="btn-analizar-abstract"
+                                class="bg-white text-purple-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-purple-50 transition-colors shadow-sm flex items-center gap-2">
+                                ✨ Analizar Artículo
+                            </button>
+                        </div>
+                        <div id="abstract-result"
+                            class="mt-6 text-sm hidden bg-black/25 p-5 rounded-2xl border border-white/10 whitespace-pre-wrap leading-relaxed relative z-10">
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
+                        <h3
+                            class="font-bold text-slate-800 dark:text-slate-200 mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">
+                            Criterios Manuales</h3>
+                        <div id="checklist-container" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Plantilla Protocolo -->
+                <div id="tab-plantilla" class="tab-content">
+                    <div class="mb-8 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Editor del Protocolo</h2>
+                            <p class="text-slate-600 dark:text-slate-400">Escribe tus ideas y usa el botón ✨ Pulir
+                                Redacción para elevar el nivel académico.</p>
+                        </div>
+                        <button onclick="copiarPlantilla()"
+                            class="bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition-colors flex items-center gap-2">
+                            <i class="ph ph-copy"></i> Copiar Todo
+                        </button>
+                    </div>
+                    <div id="plantilla-container" class="space-y-8"></div>
+                </div>
+
+                <!-- Tab 3: Productividad -->
+                <div id="tab-productividad" class="tab-content">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Enfoque Profundo</h2>
+                        <p class="text-slate-600 dark:text-slate-400">Completa Pomodoros (+25 XP) y Tareas (+10 XP). Usa
+                            ✨ para desglosar tareas grandes.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Pomodoro -->
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-8 flex flex-col items-center justify-center relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-slate-100 dark:bg-slate-700">
+                                <div id="pomodoro-progress"
+                                    class="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0 transition-all duration-1000">
+                                </div>
+                            </div>
+                            <h3
+                                class="text-lg font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6">
+                                Pomodoro Focus</h3>
+                            <div id="timer-display"
+                                class="text-7xl font-light text-slate-800 dark:text-white tabular-nums mb-8 font-mono tracking-tight">
+                                25:00</div>
+                            <div class="flex gap-4">
+                                <button onclick="startTimer()" id="btn-start-timer"
+                                    class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-transform hover:scale-105 shadow-md">
+                                    <i class="ph-fill ph-play text-2xl"></i>
+                                </button>
+                                <button onclick="pauseTimer()"
+                                    class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-transform hover:scale-105">
+                                    <i class="ph-fill ph-pause text-2xl"></i>
+                                </button>
+                                <button onclick="resetTimer()"
+                                    class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-transform hover:scale-105">
+                                    <i class="ph-fill ph-stop text-2xl"></i>
+                                </button>
+                            </div>
+                            <div class="mt-6 flex gap-2">
+                                <button onclick="setTimerMode(25)"
+                                    class="text-xs font-semibold px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">Trabajo
+                                    (25m)</button>
+                                <button onclick="setTimerMode(5)"
+                                    class="text-xs font-semibold px-4 py-2 rounded-full bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600">Descanso
+                                    (5m)</button>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Tareas -->
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-8 flex flex-col h-[420px]">
+                            <h3
+                                class="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                                <i class="ph-fill ph-list-checks text-purple-500"></i> Tu Lista
+                            </h3>
+                            <form onsubmit="addTask(event)" class="flex gap-2 mb-4">
+                                <input type="text" id="task-input"
+                                    class="flex-1 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                    placeholder="Añadir nueva tarea...">
+                                <button type="submit"
+                                    class="bg-slate-800 dark:bg-slate-600 text-white px-4 py-2 rounded-xl hover:bg-slate-900 dark:hover:bg-slate-500 transition-colors">
+                                    <i class="ph-bold ph-plus"></i>
+                                </button>
+                            </form>
+                            <div id="tasks-container" class="flex-1 overflow-y-auto space-y-2 pr-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Bitácora -->
+                <div id="tab-bitacora" class="tab-content">
+                    <div class="mb-8 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Archivo & Bitácora</h2>
+                            <p class="text-slate-600 dark:text-slate-400">Guarda un registro permanente de tu progreso
+                                diario.</p>
+                        </div>
+                        <button onclick="aiRedactarBitacora()"
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
+                            <i class="ph-fill ph-magic-wand text-lg"></i> Auto-Redactar Hoy
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Editor de hoy -->
+                        <div
+                            class="md:col-span-2 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col">
+                            <div
+                                class="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 flex justify-between items-center">
+                                <span id="fecha-bitacora"></span>
+                                <button onclick="guardarEntradaBitacora()"
+                                    class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-3 py-1 rounded-lg text-xs font-bold hover:bg-green-200 dark:hover:bg-green-800/50 transition-colors flex items-center gap-1">
+                                    <i class="ph-bold ph-floppy-disk"></i> Guardar en Archivo
+                                </button>
+                            </div>
+                            <textarea id="bitacora-input"
+                                class="w-full h-[400px] p-6 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-slate-700 dark:text-slate-300 leading-relaxed"
+                                placeholder="Escribe aquí tus avances del día. Luego haz clic en 'Guardar en Archivo' para enviarlo a la memoria persistente..."></textarea>
+                        </div>
+
+                        <!-- Historial de Bitácoras -->
+                        <div
+                            class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col h-[500px]">
+                            <h3
+                                class="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-4">
+                                <i class="ph-fill ph-archive-box text-blue-500"></i> Historial Pasado
+                            </h3>
+                            <div id="historial-bitacoras" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                                <!-- Se inyecta por JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar Asistente IA (Colapsable) -->
+    <aside id="ai-sidebar"
+        class="w-96 glass-panel border-l border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.5)] z-30 absolute right-0 top-0 h-full transform translate-x-full sidebar-transition">
+        <div
+            class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 flex justify-between items-center">
+            <h2 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white shadow-md">
+                    <i class="ph-bold ph-robot"></i>
+                </div>
+                Asistente IA
+            </h2>
+            <div class="flex gap-1">
+                <button onclick="clearChat()"
+                    class="w-8 h-8 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                    title="Limpiar chat">
+                    <i class="ph ph-broom"></i>
+                </button>
+                <button onclick="toggleAssistant()"
+                    class="w-8 h-8 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                    title="Cerrar">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-5 bg-slate-50/50 dark:bg-slate-900/20">
+            <div class="flex gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 text-white shadow-sm mt-1">
+                    <i class="ph-bold ph-robot"></i>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                    Sistema conectado. Memoria local activa. ¿En qué trabajamos hoy?
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative">
+                <textarea id="chat-input" rows="2"
+                    class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-shadow"
+                    placeholder="Pregúntame algo..."></textarea>
+                <button type="submit" id="chat-submit"
+                    class="absolute right-2 bottom-2 w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                    <i class="ph-bold ph-paper-plane-tilt"></i>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Modal para visualización de historial de bitácoras -->
+    <div id="modal-historial"
+        class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl transform scale-95 transition-transform"
+            id="modal-content-box">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 id="modal-fecha" class="text-xl font-bold text-slate-800 dark:text-white">Fecha</h3>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-red-500 transition-colors"><i
+                        class="ph-bold ph-x text-xl"></i></button>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto">
+                <p id="modal-contenido"
+                    class="text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed text-sm"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    <div id="custom-alert"
+        class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center gap-3">
+        <i class="ph-fill ph-info text-blue-400 dark:text-blue-600 text-xl"></i>
+        <span id="alert-text" class="font-medium text-sm"></span>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN API JETSON ---
+        const API_BASE = window.JETSON_API_BASE || "";
+        const APP_ID = "predoctorado";
+        const AUTH_KEY = 'phd_is_logged_in';
+
+        // --- SISTEMA DE MEMORIA (LOCALSTORAGE) ---
+        const DATA_KEY = 'phd_workspace_data';
+
+        const defaultState = {
+            xp: 0,
+            plan: [
+                { id: "s1", semana: "Semana 1: Estructura Base", dias: [{ id: "d1", dia: "Miércoles", tarea: "Planteamiento del Problema.", completada: false }, { id: "d2", dia: "Jueves", tarea: "Justificación.", completada: false }, { id: "d3", dia: "Viernes", tarea: "Objetivos e Hipótesis.", completada: false }, { id: "d4", dia: "Domingo", tarea: "Antecedentes.", completada: false }] },
+                { id: "s2", semana: "Semana 2: Estado del Arte", dias: [{ id: "d5", dia: "Miércoles", tarea: "Marco Teórico.", completada: false }, { id: "d6", dia: "Jueves", tarea: "Tabla Comparativa.", completada: false }, { id: "d7", dia: "Viernes", tarea: "Narrativa del Gap.", completada: false }, { id: "d8", dia: "Domingo", tarea: "Citas IEEE.", completada: false }] },
+                { id: "s3", semana: "Semana 3: Metodología", dias: [{ id: "d9", dia: "Miércoles", tarea: "Fase 1 y 2.", completada: false }, { id: "d10", dia: "Jueves", tarea: "Fase 3 y 4.", completada: false }, { id: "d11", dia: "Viernes", tarea: "Diagrama de Bloques.", completada: false }, { id: "d12", dia: "Domingo", tarea: "Verificación Cruzada.", completada: false }] }
+            ],
+            checklistState: {},
+            textos: {},
+            tareas: [],
+            bitacoraActual: "",
+            historialBitacoras: []
+        };
+
+        const plantillaEstructura = [
+            { id: "intro", titulo: "1. Introducción", placeholder: "Explica cómo cambia la red, las nuevas perturbaciones y tu solución..." },
+            { id: "antecedentes", titulo: "2. Antecedentes", placeholder: "Logros de la maestría (BeagleBone, Wavelet) y el puente al doctorado..." },
+            { id: "marco", titulo: "3. Marco Teórico", placeholder: "Conceptos sobre PQD múltiples, Edge Computing..." },
+            { id: "estado", titulo: "4. Estado del Arte", placeholder: "Discusión de papers recientes. Destaca hardware en borde..." },
+            { id: "problema", titulo: "5. Planteamiento del Problema", placeholder: "La falta de métodos precisos y ligeros en entornos reales..." },
+            { id: "justificacion", titulo: "6. Justificación", placeholder: "Impacto tecnológico y económico..." },
+            { id: "hipotesis", titulo: "7. Hipótesis", placeholder: "Mediante IA optimizada en SBC es posible..." },
+            { id: "objetivos", titulo: "8. Objetivos", placeholder: "Objetivo General y Específicos..." },
+            { id: "metodologia", titulo: "9. Metodología", placeholder: "Fases 1 a 4..." }
+        ];
+
+        const checklistEstructura = [
+            "1. Problema Abordado: ¿Qué tipo de perturbaciones (PQD) analiza?",
+            "2. Origen de Datos: ¿Usa señales sintéticas o reales de campo?",
+            "3. Técnica IA: ¿Usa enfoques tradicionales o Deep Learning optimizado?",
+            "4. Hardware: ¿Se ejecuta en PC o en Edge/SBC?",
+            "5. Métricas: ¿Reportan latencia, memoria y consumo?",
+            "6. Brecha: ¿Mencionan limitaciones que tu doctorado resolverá?"
+        ];
+
+        let estado = null;
+
+        // --- SISTEMA DE LOGIN ---
+        async function apiFetch(path, options = {}) {
+            const response = await fetch(`${API_BASE}${path}`, {
+                credentials: 'include',
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(options.headers || {})
+                }
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || `HTTP ${response.status}`);
+            }
+            return response.json();
+        }
+
+        async function checkLoginStatus() {
+            const overlay = document.getElementById('login-overlay');
+
+            let authenticated = sessionStorage.getItem(AUTH_KEY) === 'true';
+            try {
+                const status = await apiFetch('/api/auth/status');
+                authenticated = authenticated || status.authenticated;
+            } catch (e) {
+                authenticated = false;
+            }
+
+            if (authenticated) {
+                sessionStorage.setItem(AUTH_KEY, 'true');
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    initApp();
+                }, 500);
+            } else {
+                sessionStorage.removeItem(AUTH_KEY);
+                overlay.classList.remove('hidden');
+                overlay.style.opacity = '1';
+                aplicarTemaPrevio();
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const errorDiv = document.getElementById('login-error');
+
+            try {
+                await apiFetch('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                sessionStorage.setItem(AUTH_KEY, 'true');
+                errorDiv.classList.add('hidden');
+                checkLoginStatus();
+            } catch (e) {
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        async function logout() {
+            try { await apiFetch('/api/auth/logout', { method: 'POST', body: '{}' }); } catch (e) { }
+            sessionStorage.removeItem(AUTH_KEY);
+            location.reload();
+        }
+
+        function aplicarTemaPrevio() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-text').innerText = 'Modo Claro';
+                document.getElementById('theme-icon').className = 'ph-fill ph-sun text-xl text-yellow-400';
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // --- INICIALIZACIÓN DE APP PRINCIPAL ---
+        async function cargarEstadoRemoto() {
+            try {
+                const data = await apiFetch(`/api/state/${APP_ID}`);
+                if (data.state) {
+                    estado = { ...JSON.parse(JSON.stringify(defaultState)), ...data.state };
+                    localStorage.setItem(DATA_KEY, JSON.stringify(estado));
+                }
+            } catch (e) {
+                alertMensaje("Modo local: API no disponible para cargar memoria.");
+            }
+        }
+
+        async function initApp() {
+            const savedData = localStorage.getItem(DATA_KEY);
+            if (savedData) {
+                try {
+                    estado = JSON.parse(savedData);
+                } catch (e) {
+                    estado = JSON.parse(JSON.stringify(defaultState));
+                }
+            } else {
+                estado = JSON.parse(JSON.stringify(defaultState));
+            }
+
+            await cargarEstadoRemoto();
+            aplicarTemaPrevio();
+
+            document.getElementById('fecha-bitacora').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            const bInput = document.getElementById('bitacora-input');
+            if (estado.bitacoraActual) bInput.value = estado.bitacoraActual;
+
+            bInput.addEventListener('input', () => {
+                estado.bitacoraActual = bInput.value;
+                triggerSave();
+            });
+
+            document.getElementById('chat-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('chat-submit').click(); }
+            });
+
+            actualizarXPUI();
+            renderTodos();
+        }
+
+        let saveTimeout;
+        let remoteSaveTimeout;
+        function triggerSave() {
+            if (!estado) return; // Por si acaso se dispara antes del login
+            const status = document.getElementById('save-status');
+            status.style.opacity = '1';
+            clearTimeout(saveTimeout);
+            clearTimeout(remoteSaveTimeout);
+
+            localStorage.setItem(DATA_KEY, JSON.stringify(estado));
+            remoteSaveTimeout = setTimeout(async () => {
+                try {
+                    await apiFetch(`/api/state/${APP_ID}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ state: estado })
+                    });
+                } catch (e) {
+                    console.warn('No se pudo guardar en Jetson API; se conserva localStorage.', e);
+                }
+            }, 600);
+
+            saveTimeout = setTimeout(() => {
+                status.style.opacity = '0';
+            }, 1000);
+        }
+
+        function ganarXP(cantidad) {
+            estado.xp += cantidad;
+            actualizarXPUI();
+            triggerSave();
+
+            const xpText = document.getElementById('user-xp');
+            xpText.classList.remove('xp-gain');
+            void xpText.offsetWidth;
+            xpText.classList.add('xp-gain');
+        }
+
+        function actualizarXPUI() {
+            const nivel = Math.floor(estado.xp / 100) + 1;
+            const xpActual = estado.xp % 100;
+
+            document.getElementById('user-level').innerText = nivel;
+            document.getElementById('user-xp').innerText = `${xpActual}/100 XP`;
+            document.getElementById('xp-bar').style.width = `${xpActual}%`;
+        }
+
+        // --- RENDERIZADORES ---
+        function renderTodos() {
+            renderPlan();
+            renderChecklist();
+            renderPlantilla();
+            renderTasks();
+            renderHistorialBitacoras();
+        }
+
+        function renderPlan() {
+            const container = document.getElementById('plan-container');
+            container.innerHTML = estado.plan.map((sem, sIndex) => `
+                <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <div class="bg-slate-50 dark:bg-slate-800/80 px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200">${sem.semana}</h3>
+                    </div>
+                    <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                        ${sem.dias.map((dia, dIndex) => `
+                            <label class="flex items-start gap-4 p-5 hover:bg-slate-50 dark:hover:bg-slate-700/30 cursor-pointer transition-colors group">
+                                <input type="checkbox" onchange="togglePlan('${sIndex}', '${dIndex}')" ${dia.completada ? 'checked' : ''} class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 bg-transparent">
+                                <div>
+                                    <span class="block font-bold ${dia.completada ? 'text-slate-400 line-through' : 'text-slate-800 dark:text-slate-200'} text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">${dia.dia}</span>
+                                    <span class="block ${dia.completada ? 'text-slate-300' : 'text-slate-600 dark:text-slate-400'} text-sm mt-1 leading-relaxed">${dia.tarea}</span>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePlan(sIdx, dIdx) {
+            estado.plan[sIdx].dias[dIdx].completada = !estado.plan[sIdx].dias[dIdx].completada;
+            if (estado.plan[sIdx].dias[dIdx].completada) ganarXP(5);
+            triggerSave();
+            renderPlan();
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = checklistEstructura.map((item, idx) => `
+                <label class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-600 transition-all">
+                    <input type="checkbox" onchange="toggleChecklist('${idx}')" ${estado.checklistState[idx] ? 'checked' : ''} class="mt-1 w-4 h-4 text-purple-600 rounded border-slate-300 dark:border-slate-600 focus:ring-purple-500 bg-transparent">
+                    <span class="text-slate-700 dark:text-slate-300 font-medium text-xs leading-relaxed pt-0.5">${item}</span>
+                </label>
+            `).join('');
+        }
+
+        function toggleChecklist(idx) {
+            estado.checklistState[idx] = !estado.checklistState[idx];
+            triggerSave();
+        }
+
+        function renderPlantilla() {
+            const container = document.getElementById('plantilla-container');
+            container.innerHTML = plantillaEstructura.map(sec => `
+                <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 p-8 transition-all focus-within:shadow-md focus-within:border-blue-400 dark:focus-within:border-blue-500 relative group">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">${sec.titulo}</h3>
+                        <button onclick="aiPulirSeccion('${sec.id}')" id="btn-pulir-${sec.id}" class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <i class="ph-fill ph-sparkle"></i> ✨ Pulir Redacción
+                        </button>
+                    </div>
+                    <textarea 
+                        id="input-${sec.id}"
+                        class="w-full h-40 p-5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:bg-slate-800 transition-colors resize-y text-sm text-slate-700 dark:text-slate-300 leading-relaxed outline-none"
+                        placeholder="${sec.placeholder}"
+                        oninput="guardarTexto('${sec.id}', this.value)"
+                    >${estado.textos[sec.id] || ''}</textarea>
+                </div>
+            `).join('');
+        }
+
+        function guardarTexto(id, valor) {
+            estado.textos[id] = valor;
+            triggerSave();
+        }
+
+        // --- PRODUCTIVIDAD: TAREAS ---
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            const dashContainer = document.getElementById('dashboard-tasks');
+
+            const tasksHtml = estado.tareas.length === 0
+                ? `<div class="text-center text-slate-400 py-8 text-sm"><i class="ph-fill ph-check-circle text-4xl mb-3 opacity-50"></i><br>Sin tareas. ¡Planea tu día!</div>`
+                : estado.tareas.map(t => `
+                    <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700 group hover:border-blue-200 dark:hover:border-blue-800 transition-all">
+                        <label class="flex items-center gap-3 cursor-pointer flex-1">
+                            <input type="checkbox" ${t.completada ? 'checked' : ''} onchange="toggleTask(${t.id})" class="w-5 h-5 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 bg-transparent">
+                            <span class="text-sm font-medium ${t.completada ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'} transition-all">${t.text}</span>
+                        </label>
+                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                            <button onclick="aiDesglosarTarea(${t.id})" class="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 p-1" title="✨ Desglosar con IA">
+                                <i class="ph-fill ph-sparkle"></i>
+                            </button>
+                            <button onclick="deleteTask(${t.id})" class="text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 p-1" title="Eliminar">
+                                <i class="ph-bold ph-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+            container.innerHTML = tasksHtml;
+
+            // Dashboard
+            const pendingTasks = estado.tareas.filter(t => !t.completada).slice(0, 3);
+            if (pendingTasks.length > 0) {
+                dashContainer.innerHTML = pendingTasks.map(t => `
+                    <div class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <input type="checkbox" onchange="toggleTask(${t.id})" class="w-5 h-5 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 bg-transparent">
+                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">${t.text}</span>
+                    </div>
+                `).join('');
+            } else {
+                dashContainer.innerHTML = `<div class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-xl text-sm font-medium text-center border border-blue-100 dark:border-blue-800/30">Día libre de pendientes.</div>`;
+            }
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const input = document.getElementById('task-input');
+            const text = input.value.trim();
+            if (text) {
+                estado.tareas.push({ id: Date.now(), text, completada: false });
+                input.value = '';
+                triggerSave();
+                renderTasks();
+            }
+        }
+
+        function toggleTask(id) {
+            const task = estado.tareas.find(t => t.id === id);
+            if (task) {
+                task.completada = !task.completada;
+                if (task.completada) {
+                    ganarXP(10);
+                    alertMensaje("¡Tarea completada! +10 XP");
+                }
+                triggerSave();
+                renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            estado.tareas = estado.tareas.filter(t => t.id !== id);
+            triggerSave();
+            renderTasks();
+        }
+
+        // --- PRODUCTIVIDAD: POMODORO ---
+        let pomodoro = { time: 25 * 60, initialTime: 25 * 60, interval: null, running: false };
+
+        function updateTimerDisplay() {
+            const m = Math.floor(pomodoro.time / 60).toString().padStart(2, '0');
+            const s = (pomodoro.time % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+
+            const progress = ((pomodoro.initialTime - pomodoro.time) / pomodoro.initialTime) * 100;
+            document.getElementById('pomodoro-progress').style.width = `${progress}%`;
+        }
+
+        function startTimer() {
+            if (pomodoro.running) return;
+            pomodoro.running = true;
+            document.getElementById('btn-start-timer').classList.add('animate-pulse');
+            pomodoro.interval = setInterval(() => {
+                if (pomodoro.time > 0) {
+                    pomodoro.time--;
+                    updateTimerDisplay();
+                } else {
+                    pauseTimer();
+                    if (pomodoro.initialTime > 5 * 60) {
+                        ganarXP(25);
+                        alertMensaje("¡Sesión completada! +25 XP");
+                    } else {
+                        alertMensaje("Descanso terminado. ¡A trabajar!");
+                    }
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            pomodoro.running = false;
+            clearInterval(pomodoro.interval);
+            document.getElementById('btn-start-timer').classList.remove('animate-pulse');
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            pomodoro.time = pomodoro.initialTime;
+            updateTimerDisplay();
+        }
+
+        function setTimerMode(mins) {
+            pauseTimer();
+            pomodoro.initialTime = mins * 60;
+            pomodoro.time = pomodoro.initialTime;
+            updateTimerDisplay();
+        }
+
+        // --- BITÁCORA Y ARCHIVO HISTÓRICO ---
+        function renderHistorialBitacoras() {
+            const container = document.getElementById('historial-bitacoras');
+            if (!estado.historialBitacoras || estado.historialBitacoras.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-400 text-center py-4">No hay entradas guardadas en el archivo histórico.</p>`;
+                return;
+            }
+
+            const reversed = [...estado.historialBitacoras].reverse();
+            container.innerHTML = reversed.map((b, index) => `
+                <div onclick="abrirModalHistorial(${estado.historialBitacoras.length - 1 - index})" class="p-4 bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-slate-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 cursor-pointer transition-colors group">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:underline">${b.fecha}</span>
+                        <i class="ph-bold ph-caret-right text-slate-300 group-hover:text-blue-500"></i>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${b.contenido}</p>
+                </div>
+            `).join('');
+        }
+
+        async function guardarEntradaBitacora() {
+            const input = document.getElementById('bitacora-input');
+            const texto = input.value.trim();
+            if (!texto) {
+                alertMensaje("La bitácora actual está vacía.");
+                return;
+            }
+
+            const hoyStr = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            try {
+                await apiFetch('/api/bitacora', {
+                    method: 'POST',
+                    body: JSON.stringify({ fecha: hoyStr, contenido: texto })
+                });
+            } catch (e) {
+                console.warn('No se pudo guardar bitácora en SQLite; se conservará en localStorage.', e);
+            }
+
+            estado.historialBitacoras.push({
+                fecha: hoyStr,
+                contenido: texto
+            });
+
+            estado.bitacoraActual = "";
+            input.value = "";
+
+            ganarXP(15);
+            triggerSave();
+            renderHistorialBitacoras();
+            alertMensaje("¡Entrada archivada! +15 XP");
+        }
+
+        function abrirModalHistorial(index) {
+            const entrada = estado.historialBitacoras[index];
+            document.getElementById('modal-fecha').innerText = entrada.fecha;
+            document.getElementById('modal-contenido').innerText = entrada.contenido;
+
+            const modal = document.getElementById('modal-historial');
+            const box = document.getElementById('modal-content-box');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modal-historial');
+            const box = document.getElementById('modal-content-box');
+
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- SISTEMA DE THEME (Modo Oscuro) ---
+        function toggleTheme() {
+            const htmlTag = document.documentElement;
+            const themeText = document.getElementById('theme-text');
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (htmlTag.classList.contains('dark')) {
+                htmlTag.classList.remove('dark');
+                localStorage.theme = 'light';
+                themeText.innerText = 'Modo Oscuro';
+                themeIcon.className = 'ph-fill ph-moon text-xl text-slate-600';
+            } else {
+                htmlTag.classList.add('dark');
+                localStorage.theme = 'dark';
+                themeText.innerText = 'Modo Claro';
+                themeIcon.className = 'ph-fill ph-sun text-xl text-yellow-400';
+            }
+        }
+
+        // --- SISTEMA DE PESTAÑAS (TABS) ---
+        function switchTab(tabId) {
+            const tabNames = { 'inicio': 'Panel de Inicio', 'plan': 'Plan de Trabajo', 'checklist': 'Análisis de Papers', 'plantilla': 'Editor de Protocolo', 'productividad': 'Enfoque & Tareas', 'bitacora': 'Archivo & Bitácora' };
+
+            ['inicio', 'plan', 'checklist', 'plantilla', 'productividad', 'bitacora'].forEach(id => {
+                const btn = document.getElementById(`btn-${id}`);
+                if (id === tabId) {
+                    btn.className = "nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300 shadow-sm";
+                } else {
+                    btn.className = "nav-btn flex items-center gap-3 px-4 py-3 rounded-xl w-full text-left font-medium transition-all hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300";
+                }
+            });
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById('current-tab-title').innerText = tabNames[tabId];
+        }
+
+        // --- ASISTENTE COLAPSABLE ---
+        let assistantOpen = false;
+        function toggleAssistant() {
+            const sidebar = document.getElementById('ai-sidebar');
+            assistantOpen = !assistantOpen;
+            if (assistantOpen) {
+                sidebar.classList.remove('translate-x-full');
+            } else {
+                sidebar.classList.add('translate-x-full');
+            }
+        }
+
+        // --- EXPORTAR ---
+        function copiarPlantilla() {
+            let contenido = "# PROPUESTA DE TEMA DE TESIS DE DOCTORADO\n\n";
+            plantillaEstructura.forEach(sec => {
+                contenido += `## ${sec.titulo}\n\n${estado.textos[sec.id] || "..."}\n\n`;
+            });
+            const temp = document.createElement("textarea");
+            temp.value = contenido;
+            document.body.appendChild(temp);
+            temp.select();
+            try { document.execCommand('copy'); alertMensaje("Documento copiado al portapapeles"); }
+            catch (err) { alertMensaje("Error al copiar."); }
+            document.body.removeChild(temp);
+        }
+
+        function alertMensaje(msg) {
+            const alertBox = document.getElementById('custom-alert');
+            document.getElementById('alert-text').innerText = msg;
+            alertBox.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => { alertBox.classList.add('opacity-0', 'pointer-events-none'); }, 3000);
+        }
+
+        // --- SISTEMA IA (JETSON API + OPENROUTER SERVER-SIDE) ---
+        const systemPrompt = `Eres el asistente experto de Juan Pablo García Chávez para su doctorado ITM. Eres pragmático, evitas formalismos y saludos largos. Ayudas con PQD complejas, Wavelet, y Edge Computing (SBC). Si pide redactar, proporciona texto limpio sin markdown complejo. Responde siempre en español, usa sistema métrico, cita en IEEE si es necesario.`;
+
+        async function callJetsonAI(prompt, isJson = false) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            const payload = { prompt, system_prompt: systemPrompt, is_json: isJson };
+
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const data = await apiFetch('/api/ai/chat', {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    return data.text;
+                } catch (e) {
+                    if (i === 4) throw e;
+                    await new Promise(r => setTimeout(r, delays[i]));
+                }
+            }
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const submitBtn = document.getElementById('chat-submit');
+            const userText = inputEl.value.trim();
+            if (!userText) return;
+
+            if (!assistantOpen) toggleAssistant();
+
+            appendMessage(userText, 'user');
+            inputEl.value = '';
+            submitBtn.disabled = true;
+
+            const loadingId = appendLoading();
+            try {
+                const responseText = await callJetsonAI(userText);
+                removeElement(loadingId);
+                appendMessage(responseText, 'bot');
+            } catch (error) {
+                removeElement(loadingId);
+                appendMessage("Error de conexión. Reintenta.", 'error');
+            } finally {
+                submitBtn.disabled = false;
+                inputEl.focus();
+            }
+        }
+
+        // --- NUEVAS HERRAMIENTAS LLM ---
+        async function aiAnalizarAbstract() {
+            const input = document.getElementById('abstract-input');
+            const resultDiv = document.getElementById('abstract-result');
+            const btn = document.getElementById('btn-analizar-abstract');
+
+            if (!input.value.trim()) {
+                alertMensaje("Por favor, pega un texto primero.");
+                return;
+            }
+
+            btn.innerHTML = '<div class="spinner"></div> Analizando...';
+            btn.disabled = true;
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = '<span class="animate-pulse">Consultando a la Jetson...</span>';
+
+            try {
+                const prompt = `Analiza el siguiente abstract científico de acuerdo con mis intereses de doctorado (PQD múltiples/complejas, Edge Computing, SBC, Señales Reales). Evalúa punto por punto y dime si me sirve para el estado del arte. Sé conciso y directo.\n\nAbstract: ${input.value}`;
+                const respuesta = await callJetsonAI(prompt);
+                resultDiv.innerHTML = escapeHtml(respuesta);
+            } catch (e) {
+                resultDiv.innerHTML = '<span class="text-red-400">Error al analizar el texto.</span>';
+            } finally {
+                btn.innerHTML = '✨ Analizar Artículo';
+                btn.disabled = false;
+            }
+        }
+
+        async function aiPulirSeccion(secId) {
+            const textarea = document.getElementById(`input-${secId}`);
+            const btn = document.getElementById(`btn-pulir-${secId}`);
+
+            if (!textarea.value.trim()) {
+                alertMensaje("Escribe un borrador primero para poder pulirlo.");
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner border-indigo-600 border-t-transparent w-4 h-4"></div>';
+            btn.disabled = true;
+
+            try {
+                const prompt = `Reescribe el siguiente texto para un protocolo de ingreso al doctorado (Tema: PQD y Edge Computing). Mejora la redacción académica, usa vocabulario formal de ingeniería y asegura cohesión en tercera persona o formato impersonal. Solo devuelve el texto mejorado, sin introducciones.\n\nTexto original:\n${textarea.value}`;
+                const respuesta = await callJetsonAI(prompt);
+
+                textarea.value = respuesta;
+                guardarTexto(secId, respuesta);
+                alertMensaje("¡Redacción mejorada con éxito!");
+            } catch (e) {
+                alertMensaje("Error al contactar con la IA.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function aiDesglosarTarea(taskId) {
+            const taskIndex = estado.tareas.findIndex(t => t.id === taskId);
+            if (taskIndex === -1) return;
+            const task = estado.tareas[taskIndex];
+
+            alertMensaje("✨ Desglosando tarea con IA...");
+
+            try {
+                const prompt = `Desglosa la siguiente tarea de mi protocolo de doctorado en 3 sub-tareas muy breves (máx 10 palabras cada una) y accionables. Tarea original: "${task.text}"`;
+                const jsonStr = await callJetsonAI(prompt, true); // Retorna Array JSON puro
+                const subtareas = JSON.parse(jsonStr);
+
+                estado.tareas.splice(taskIndex, 1);
+                subtareas.forEach((st, i) => {
+                    estado.tareas.splice(taskIndex + i, 0, { id: Date.now() + i, text: st, completada: false });
+                });
+
+                triggerSave();
+                renderTasks();
+                alertMensaje("¡Tarea desglosada!");
+            } catch (e) {
+                alertMensaje("Error al desglosar la tarea.");
+            }
+        }
+
+        async function aiPlanearDia() {
+            if (!assistantOpen) toggleAssistant();
+            appendMessage("Sugiere 3 tareas de investigación para hoy.", 'user');
+            const loadingId = appendLoading();
+            try {
+                const prompt = `Sugiere 3 tareas concisas que deba realizar hoy sobre mi propuesta de PQD en Edge Computing. Formato: lista simple sin saludos.`;
+                const respuesta = await callJetsonAI(prompt);
+                removeElement(loadingId);
+                appendMessage(`Enfoque sugerido:\n${respuesta}`, 'bot');
+            } catch (e) {
+                removeElement(loadingId);
+                appendMessage("Error al procesar la solicitud.", "error");
+            }
+        }
+
+        async function aiRedactarBitacora() {
+            const input = document.getElementById('bitacora-input');
+            const notasManuales = input.value;
+            const tareasCompletadas = estado.tareas.filter(t => t.completada).map(t => t.text);
+
+            if (tareasCompletadas.length === 0 && !notasManuales) {
+                alertMensaje("Marca alguna tarea como completada o añade notas base.");
+                return;
+            }
+
+            if (!assistantOpen) toggleAssistant();
+            appendMessage("Genera reporte de bitácora diario.", 'user');
+            const loadingId = appendLoading();
+
+            try {
+                const prompt = `Redacta una entrada de bitácora académica en primera persona para hoy. Tareas: ${tareasCompletadas.length > 0 ? tareasCompletadas.join(', ') : 'Ninguna marcada'}. Apuntes: ${notasManuales || 'Ninguno'}. Máximo 2 párrafos formales. Sin rodeos.`;
+                const respuesta = await callJetsonAI(prompt);
+                removeElement(loadingId);
+
+                input.value = respuesta;
+                estado.bitacoraActual = respuesta;
+                triggerSave();
+
+                appendMessage("Bitácora generada en el editor. Recuerda hacer clic en 'Guardar en Archivo' para conservarla.", 'bot');
+                switchTab('bitacora');
+                alertMensaje("Bitácora redactada");
+            } catch (e) {
+                removeElement(loadingId);
+                appendMessage("Error al redactar.", "error");
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const isUser = sender === 'user';
+            const html = isUser ? `
+                <div class="flex gap-3 flex-row-reverse">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 dark:bg-slate-700 flex items-center justify-center flex-shrink-0 text-white shadow-sm mt-1 text-xs font-bold">JP</div>
+                    <div class="bg-blue-600 text-white p-4 rounded-2xl rounded-tr-none shadow-sm text-sm whitespace-pre-wrap">${escapeHtml(text)}</div>
+                </div>` : `
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 text-white shadow-sm mt-1"><i class="ph-bold ${sender === 'error' ? 'ph-warning' : 'ph-robot'}"></i></div>
+                    <div class="bg-white dark:bg-slate-800 border ${sender === 'error' ? 'border-red-200 dark:border-red-800 text-red-600' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'} p-4 rounded-2xl rounded-tl-none shadow-sm text-sm whitespace-pre-wrap leading-relaxed">${escapeHtml(text)}</div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendLoading() {
+            const id = 'loading-' + Date.now();
+            document.getElementById('chat-messages').insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 text-white shadow-sm mt-1"><i class="ph-bold ph-robot animate-pulse"></i></div>
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
+                        <div class="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>`);
+            return id;
+        }
+
+        function removeElement(id) { const el = document.getElementById(id); if (el) el.remove(); }
+        function clearChat() { document.getElementById('chat-messages').innerHTML = ''; appendMessage('Historial de sesión borrado. Memoria local sigue intacta.', 'bot'); }
+        function escapeHtml(unsafe) { return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+
+        // --- INICIO DE APLICACIÓN ---
+        window.onload = () => {
+            // Verificar si debe mostrar el login o la app
+            checkLoginStatus();
+        };
+
+    </script>
+</body>
+
+</html>
