@@ -656,6 +656,7 @@
         const API_BASE = window.JETSON_API_BASE || "";
         const APP_ID = "predoctorado";
         const AUTH_KEY = 'phd_is_logged_in';
+        const SESSION_TOKEN_KEY = 'phd_session_token';
 
         // --- SISTEMA DE MEMORIA (LOCALSTORAGE) ---
         const DATA_KEY = 'phd_workspace_data';
@@ -699,11 +700,13 @@
 
         // --- SISTEMA DE LOGIN ---
         async function apiFetch(path, options = {}) {
+            const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
             const response = await fetch(`${API_BASE}${path}`, {
                 credentials: 'include',
                 ...options,
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(sessionToken ? { 'X-Session-Token': sessionToken } : {}),
                     ...(options.headers || {})
                 }
             });
@@ -747,10 +750,13 @@
             const errorDiv = document.getElementById('login-error');
 
             try {
-                await apiFetch('/api/auth/login', {
+                const loginResult = await apiFetch('/api/auth/login', {
                     method: 'POST',
                     body: JSON.stringify({ username: u, password: p })
                 });
+                if (loginResult.session_token) {
+                    sessionStorage.setItem(SESSION_TOKEN_KEY, loginResult.session_token);
+                }
                 sessionStorage.setItem(AUTH_KEY, 'true');
                 errorDiv.classList.add('hidden');
                 checkLoginStatus();
@@ -762,6 +768,7 @@
         async function logout() {
             try { await apiFetch('/api/auth/logout', { method: 'POST', body: '{}' }); } catch (e) { }
             sessionStorage.removeItem(AUTH_KEY);
+            sessionStorage.removeItem(SESSION_TOKEN_KEY);
             location.reload();
         }
 

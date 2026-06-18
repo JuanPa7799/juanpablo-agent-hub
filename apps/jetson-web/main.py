@@ -75,7 +75,10 @@ app.add_middleware(
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://192.168.1.230:8000",
+        "https://juanpa7799.github.io",
+        "https://JuanPa7799.github.io",
     ],
+    allow_origin_regex=r"https://[-a-zA-Z0-9]+\.trycloudflare\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -142,11 +145,14 @@ def verify_session(token: str) -> bool:
 
 def require_auth(
     x_app_token: Optional[str] = Header(None),
+    x_session_token: Optional[str] = Header(None),
     session: Optional[str] = Cookie(None, alias=SESSION_COOKIE),
 ) -> None:
     if not AUTH_ENABLED:
         return
     if APP_TOKEN and x_app_token and hmac.compare_digest(APP_TOKEN, x_app_token):
+        return
+    if x_session_token and verify_session(x_session_token):
         return
     if session and verify_session(session):
         return
@@ -172,15 +178,16 @@ def health() -> Dict[str, Any]:
 def login(payload: LoginRequest, response: Response) -> Dict[str, Any]:
     if payload.username != WEB_USER or payload.password != WEB_PASSWORD:
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+    session_token = sign_session(WEB_USER)
     response.set_cookie(
         key=SESSION_COOKIE,
-        value=sign_session(WEB_USER),
+        value=session_token,
         httponly=True,
         samesite="lax",
         secure=False,
         max_age=60 * 60 * 24 * 14,
     )
-    return {"ok": True}
+    return {"ok": True, "session_token": session_token}
 
 
 @app.post("/api/auth/logout")
@@ -190,8 +197,15 @@ def logout(response: Response) -> Dict[str, Any]:
 
 
 @app.get("/api/auth/status")
-def auth_status(session: Optional[str] = Cookie(None, alias=SESSION_COOKIE)) -> Dict[str, Any]:
-    return {"authenticated": bool(session and verify_session(session))}
+def auth_status(
+    x_session_token: Optional[str] = Header(None),
+    session: Optional[str] = Cookie(None, alias=SESSION_COOKIE),
+) -> Dict[str, Any]:
+    authenticated = bool(
+        (x_session_token and verify_session(x_session_token))
+        or (session and verify_session(session))
+    )
+    return {"authenticated": authenticated}
 
 
 @app.post("/api/ai/chat")
