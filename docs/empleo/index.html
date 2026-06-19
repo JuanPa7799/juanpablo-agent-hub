@@ -62,6 +62,21 @@
     </aside>
 
     <main class="min-h-screen w-full px-4 py-5 lg:ml-72 lg:px-8">
+      <div class="mb-4 rounded-2xl border border-slate-800 bg-slate-950/90 p-3 lg:hidden">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <a href="../" class="flex items-center gap-2 text-sm font-bold text-blue-300"><i class="ph ph-house"></i> Portal</a>
+          <button onclick="logout()" class="text-sm font-semibold text-slate-400">Salir</button>
+        </div>
+        <select id="mobile-view-select" onchange="switchView(this.value)" class="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-sm font-semibold text-white">
+          <option value="dashboard">Dashboard</option>
+          <option value="radar">Radar</option>
+          <option value="cv">CV / Perfil</option>
+          <option value="kanban">Kanban</option>
+          <option value="entrevista">Entrevistas</option>
+          <option value="networking">Networking</option>
+          <option value="bitacora">Bitacora</option>
+        </select>
+      </div>
       <header class="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-5 md:flex-row md:items-center md:justify-between">
         <div><p class="text-xs font-bold uppercase tracking-[.35em] text-blue-300">Agent Hub</p><h2 id="view-title" class="mt-1 text-3xl font-black text-white">Dashboard de empleo</h2><p class="mt-2 max-w-3xl text-sm text-slate-400">Aplicaciones Data/ML con IA bajo demanda, sin scraping continuo en la Jetson Nano.</p></div>
         <div class="flex flex-wrap gap-2"><button onclick="saveNow()" class="rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-blue-400"><i class="ph ph-floppy-disk"></i> Guardar</button><button onclick="switchView('radar')" class="btn-gradient rounded-xl px-4 py-2 text-sm font-bold text-white"><i class="ph ph-radar"></i> Analizar vacante</button></div>
@@ -122,7 +137,7 @@
     const API_BASE = window.JETSON_API_BASE || "";
     const APP_ID = "empleo";
     const AUTH_KEY = "job_is_logged_in";
-    const SESSION_TOKEN_KEY = "job_session_token";
+    const SESSION_TOKEN_KEY = "agent_hub_session_token";
     const DATA_KEY = "job_agent_state_v1";
     const STATUSES = ["por_revisar", "prioritaria", "postulada", "entrevista", "cerrada"];
     const STATUS_LABELS = { por_revisar:"Por revisar", prioritaria:"Prioritaria", postulada:"Postulada", entrevista:"Entrevista", cerrada:"Oferta / rechazo" };
@@ -130,7 +145,7 @@
     let state = null, saveTimer = null, chart = null;
 
     async function apiFetch(path, options = {}) {
-      const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
+      const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY) || localStorage.getItem(SESSION_TOKEN_KEY);
       let response;
       try {
         response = await fetch(`${API_BASE}${path}`, { credentials:"include", ...options, headers:{ "Content-Type":"application/json", ...(sessionToken ? { "X-Session-Token": sessionToken } : {}), ...(options.headers || {}) } });
@@ -155,7 +170,7 @@
       const errorDiv = document.getElementById("login-error");
       try {
         const result = await apiFetch("/api/auth/login", { method:"POST", body:JSON.stringify({ username:document.getElementById("login-user").value, password:document.getElementById("login-pass").value }) });
-        if (result.session_token) sessionStorage.setItem(SESSION_TOKEN_KEY, result.session_token);
+        if (result.session_token) { sessionStorage.setItem(SESSION_TOKEN_KEY, result.session_token); localStorage.setItem(SESSION_TOKEN_KEY, result.session_token); }
         sessionStorage.setItem(AUTH_KEY, "true");
         errorDiv.classList.add("hidden");
         checkLoginStatus();
@@ -171,12 +186,12 @@
 
     async function logout() {
       try { await apiFetch("/api/auth/logout", { method:"POST", body:"{}" }); } catch (_) { }
-      sessionStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(SESSION_TOKEN_KEY); location.reload();
+      sessionStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(SESSION_TOKEN_KEY); localStorage.removeItem(SESSION_TOKEN_KEY); location.reload();
     }
 
     async function callJetsonAI(prompt, isJson = false, systemPrompt = "Eres un coach experto en busqueda de empleo Data/ML, ATS, CV tecnico, entrevistas y networking. Responde en espanol claro y accionable.") {
       const data = await apiFetch("/api/ai/chat", { method:"POST", body:JSON.stringify({ prompt, is_json:isJson, system_prompt:systemPrompt }) });
-      return data.text;
+      return data.text || data.response || data.message || "";
     }
 
     function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
@@ -219,6 +234,8 @@
       document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
       document.getElementById(`view-${view}`).classList.remove("hidden");
       document.querySelectorAll(".nav").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+      const mobileSelect = document.getElementById("mobile-view-select");
+      if (mobileSelect && mobileSelect.value !== view) mobileSelect.value = view;
       document.getElementById("view-title").textContent = { dashboard:"Dashboard de empleo", radar:"Radar de oportunidades", cv:"CV / Perfil maestro", kanban:"Kanban de postulaciones", entrevista:"Simulador de entrevistas", networking:"Networking", bitacora:"Bitacora" }[view];
       if (view === "dashboard") setTimeout(renderChart, 40);
     }

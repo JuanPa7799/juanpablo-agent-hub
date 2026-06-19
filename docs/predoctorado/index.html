@@ -217,7 +217,7 @@
 
     <!-- Sidebar Navegación Principal -->
     <nav
-        class="w-64 glass-panel flex flex-col flex-shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-20 relative">
+        class="w-64 glass-panel hidden lg:flex flex-col flex-shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-20 relative">
         <div class="p-6 border-b border-slate-100 dark:border-slate-800">
             <h1 class="text-xl font-bold flex items-center gap-2 tracking-tight">
                 <i class="ph-fill ph-graduation-cap text-2xl text-blue-600 dark:text-blue-400"></i>
@@ -300,6 +300,25 @@
 
     <!-- Área Principal -->
     <main class="flex-1 flex flex-col relative bg-[#f8fafc] dark:bg-slate-900/50 overflow-hidden">
+        <div class="lg:hidden glass-panel border-b border-slate-200 dark:border-slate-800 p-3 z-20">
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <a href="../" class="flex items-center gap-2 text-sm font-bold text-blue-600 dark:text-blue-300">
+                    <i class="ph ph-house"></i> Portal
+                </a>
+                <button onclick="toggleAssistant()" class="text-sm font-bold text-purple-600 dark:text-purple-300">
+                    IA
+                </button>
+            </div>
+            <select id="mobile-tab-select" onchange="switchTab(this.value)"
+                class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm font-semibold text-slate-800 dark:text-white">
+                <option value="inicio">Panel de Inicio</option>
+                <option value="plan">Plan de Trabajo</option>
+                <option value="checklist">Analisis de Papers</option>
+                <option value="plantilla">Editor de Protocolo</option>
+                <option value="productividad">Enfoque & Tareas</option>
+                <option value="bitacora">Archivo & Bitacora</option>
+            </select>
+        </div>
 
         <!-- Header superior -->
         <header
@@ -581,7 +600,7 @@
 
     <!-- Sidebar Asistente IA (Colapsable) -->
     <aside id="ai-sidebar"
-        class="w-96 glass-panel border-l border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.5)] z-30 absolute right-0 top-0 h-full transform translate-x-full sidebar-transition">
+        class="w-full max-w-sm lg:w-96 glass-panel border-l border-slate-200 dark:border-slate-800 flex flex-col flex-shrink-0 shadow-[-10px_0_30px_rgba(0,0,0,0.05)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.5)] z-30 absolute right-0 top-0 h-full transform translate-x-full sidebar-transition">
         <div
             class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 flex justify-between items-center">
             <h2 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
@@ -660,7 +679,7 @@
         const API_BASE = window.JETSON_API_BASE || "";
         const APP_ID = "predoctorado";
         const AUTH_KEY = 'phd_is_logged_in';
-        const SESSION_TOKEN_KEY = 'phd_session_token';
+        const SESSION_TOKEN_KEY = 'agent_hub_session_token';
 
         // --- SISTEMA DE MEMORIA (LOCALSTORAGE) ---
         const DATA_KEY = 'phd_workspace_data';
@@ -704,7 +723,7 @@
 
         // --- SISTEMA DE LOGIN ---
         async function apiFetch(path, options = {}) {
-            const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY);
+            const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY) || localStorage.getItem(SESSION_TOKEN_KEY);
             let response;
             try {
                 response = await fetch(`${API_BASE}${path}`, {
@@ -786,6 +805,7 @@
                 });
                 if (loginResult.session_token) {
                     sessionStorage.setItem(SESSION_TOKEN_KEY, loginResult.session_token);
+                    localStorage.setItem(SESSION_TOKEN_KEY, loginResult.session_token);
                 }
                 sessionStorage.setItem(AUTH_KEY, 'true');
                 errorDiv.classList.add('hidden');
@@ -800,6 +820,7 @@
             try { await apiFetch('/api/auth/logout', { method: 'POST', body: '{}' }); } catch (e) { }
             sessionStorage.removeItem(AUTH_KEY);
             sessionStorage.removeItem(SESSION_TOKEN_KEY);
+            localStorage.removeItem(SESSION_TOKEN_KEY);
             location.reload();
         }
 
@@ -1220,6 +1241,8 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById('current-tab-title').innerText = tabNames[tabId];
+            const mobileSelect = document.getElementById('mobile-tab-select');
+            if (mobileSelect && mobileSelect.value !== tabId) mobileSelect.value = tabId;
         }
 
         // --- ASISTENTE COLAPSABLE ---
