@@ -9,6 +9,8 @@ CF_LOG="$WEB_DIR/cloudflare.log"
 CF_PID="$WEB_DIR/cloudflared.pid"
 API_LOG="$WEB_DIR/api.log"
 GIT_KEY="/jetson_real/home/jetsonclaw/.ssh/id_rsa"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.juanpablogc.com}"
+USE_TEMP_TUNNEL="${USE_TEMP_TUNNEL:-0}"
 
 export GIT_SSH_COMMAND="ssh -i $GIT_KEY -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
 
@@ -146,7 +148,12 @@ main() {
   ensure_api
   ensure_repo
   local public_url
-  public_url="$(ensure_cloudflared | tail -1)"
+  if [ "$USE_TEMP_TUNNEL" = "1" ]; then
+    public_url="$(ensure_cloudflared | tail -1)"
+  else
+    public_url="$PUBLIC_API_URL"
+    log "Using stable API URL: $public_url"
+  fi
   update_github_pages_config "$public_url"
   log "Agent Hub automation completed"
 }
