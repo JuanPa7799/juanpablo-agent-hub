@@ -2,6 +2,12 @@
 
 Este archivo define la arquitectura conceptual del sistema multiagente. La implementacion activa inicial vive en la Jetson con FastAPI + PicoClaw.
 
+La planificacion detallada, prompts para Gemini Canvas, prompts para Codex y checklists viven en:
+
+```text
+GENERAL/JETSON_CLAW/PLAN_MAESTRO_AGENT_HUB/
+```
+
 ## Orquestador Principal
 
 - Mision: recibir solicitudes del portal maestro, decidir que subagente debe actuar y consolidar resultados.
