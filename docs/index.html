@@ -1,63 +1,173 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Juan Pablo Agent Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <script src="config.js"></script>
 </head>
+
 <body class="min-h-screen bg-slate-950 text-slate-100">
-  <main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10">
-    <header class="mb-10 flex flex-col gap-3 border-b border-slate-800 pb-8">
-      <p class="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">Jetson Nano + agentes</p>
-      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Juan Pablo Agent Hub</h1>
-      <p class="max-w-3xl text-slate-300">
-        Portal maestro para acceder a paginas de investigacion, productividad, portfolio y futuros agentes personales.
-      </p>
+  <div class="pointer-events-none fixed inset-0 opacity-70" aria-hidden="true">
+    <div class="absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_22%_18%,rgba(14,165,233,.24),transparent_30%),radial-gradient(circle_at_78%_12%,rgba(124,58,237,.23),transparent_28%)]"></div>
+  </div>
+
+  <main class="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+    <header class="mb-6 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur sm:p-7">
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.28em] text-cyan-300">Jetson Nano + agentes privados</p>
+          <h1 class="mt-3 text-4xl font-black tracking-tight text-white sm:text-5xl">Juan Pablo Agent Hub</h1>
+          <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
+            Portal maestro para investigacion, productividad, empleo, administracion segura de Jetson y futuros agentes personales.
+          </p>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-950/75 p-4">
+          <p class="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">API Jetson</p>
+          <div class="mt-3 flex items-center gap-2">
+            <span id="api-dot" class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+            <span id="api-status" class="text-sm font-bold text-amber-200">Verificando</span>
+          </div>
+        </div>
+      </div>
     </header>
 
-    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      <a class="group rounded-lg border border-slate-800 bg-slate-900 p-5 transition hover:border-cyan-400 hover:bg-slate-900/80" href="predoctorado/">
-        <p class="mb-2 text-sm font-semibold text-cyan-300">Disponible</p>
-        <h2 class="text-xl font-bold">Doctorado / Predoctorado</h2>
+    <section class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/65 p-4">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Disponibles</p>
+        <p class="mt-2 text-3xl font-black text-white">4</p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/65 p-4">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Planeadas</p>
+        <p class="mt-2 text-3xl font-black text-white">4</p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/65 p-4">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Frontend</p>
+        <p class="mt-2 text-lg font-black text-cyan-200">GitHub Pages</p>
+      </div>
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/65 p-4">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Backend</p>
+        <p class="mt-2 text-lg font-black text-violet-200">Jetson FastAPI</p>
+      </div>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Aplicaciones">
+      <a class="group flex min-h-56 flex-col rounded-2xl border border-cyan-500/25 bg-slate-900/75 p-5 transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-slate-900"
+        href="predoctorado/">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-200">Disponible</span>
+          <i class="ph ph-graduation-cap text-3xl text-cyan-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Doctorado / Predoctorado</h2>
         <p class="mt-3 text-sm leading-6 text-slate-400">Workspace academico con IA, bitacora, tareas, papers y protocolo.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-cyan-200">Abrir app</span>
       </a>
 
-      <a class="group rounded-lg border border-slate-800 bg-slate-900 p-5 transition hover:border-purple-400 hover:bg-slate-900/80" href="productividad/">
-        <p class="mb-2 text-sm font-semibold text-purple-300">Disponible</p>
-        <h2 class="text-xl font-bold">Productividad</h2>
-        <p class="mt-3 text-sm leading-6 text-slate-400">Centro de mando para metas, tareas, agentes, bitacoras y prioridades.</p>
-      </a>
-
-      <article class="rounded-lg border border-slate-800 bg-slate-900 p-5 opacity-80">
-        <p class="mb-2 text-sm font-semibold text-slate-400">Siguiente</p>
-        <h2 class="text-xl font-bold">Jetson Tools</h2>
-        <p class="mt-3 text-sm leading-6 text-slate-400">Accesos seguros a estado de la Jetson, API, agentes y terminal web futura.</p>
-      </article>
-
-      <article class="rounded-lg border border-slate-800 bg-slate-900 p-5 opacity-80">
-        <p class="mb-2 text-sm font-semibold text-slate-400">Planeado</p>
-        <h2 class="text-xl font-bold">Portfolio</h2>
-        <p class="mt-3 text-sm leading-6 text-slate-400">Vista publica de proyectos, dashboard y agente curador de CV/portfolio.</p>
-      </article>
-
-      <a class="group rounded-lg border border-slate-800 bg-slate-900 p-5 transition hover:border-blue-400 hover:bg-slate-900/80" href="empleo/">
-        <p class="mb-2 text-sm font-semibold text-blue-300">Disponible</p>
-        <h2 class="text-xl font-bold">Busqueda de Empleo</h2>
+      <a class="group flex min-h-56 flex-col rounded-2xl border border-blue-500/25 bg-slate-900/75 p-5 transition hover:-translate-y-1 hover:border-blue-300 hover:bg-slate-900"
+        href="empleo/">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-blue-400/10 px-3 py-1 text-xs font-bold text-blue-200">Disponible</span>
+          <i class="ph ph-briefcase text-3xl text-blue-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Busqueda de Empleo</h2>
         <p class="mt-3 text-sm leading-6 text-slate-400">Radar privado para vacantes, CV adaptado, entrevistas, networking y seguimiento.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-blue-200">Abrir app</span>
       </a>
 
-      <article class="rounded-lg border border-slate-800 bg-slate-900 p-5 opacity-80">
-        <p class="mb-2 text-sm font-semibold text-slate-400">Planeado</p>
-        <h2 class="text-xl font-bold">Asistente Virtual</h2>
-        <p class="mt-3 text-sm leading-6 text-slate-400">Integracion futura con Drive, correo, calendario y memoria personal.</p>
+      <a class="group flex min-h-56 flex-col rounded-2xl border border-violet-500/25 bg-slate-900/75 p-5 transition hover:-translate-y-1 hover:border-violet-300 hover:bg-slate-900"
+        href="productividad/">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-violet-400/10 px-3 py-1 text-xs font-bold text-violet-200">Disponible</span>
+          <i class="ph ph-kanban text-3xl text-violet-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Productividad</h2>
+        <p class="mt-3 text-sm leading-6 text-slate-400">Centro de mando para metas, tareas, agentes, bitacoras y prioridades.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-violet-200">Abrir app</span>
+      </a>
+
+      <a class="group flex min-h-56 flex-col rounded-2xl border border-red-500/25 bg-slate-900/75 p-5 transition hover:-translate-y-1 hover:border-red-300 hover:bg-slate-900"
+        href="admin-remoto/">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-red-400/10 px-3 py-1 text-xs font-bold text-red-200">Disponible</span>
+          <i class="ph ph-shield-check text-3xl text-red-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Admin Remoto</h2>
+        <p class="mt-3 text-sm leading-6 text-slate-400">Zona protegida para revisar Jetson, servicios, logs resumidos y comandos permitidos.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-red-200">Abrir app</span>
+      </a>
+
+      <article class="flex min-h-56 flex-col rounded-2xl border border-emerald-500/20 bg-slate-900/55 p-5 opacity-85">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">Planeado</span>
+          <i class="ph ph-cpu text-3xl text-emerald-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Jetson Tools</h2>
+        <p class="mt-3 text-sm leading-6 text-slate-400">Monitoreo ligero de salud, recursos, servicios y logs sanitizados sin terminal publica.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-slate-500">Pendiente</span>
+      </article>
+
+      <article class="flex min-h-56 flex-col rounded-2xl border border-amber-500/20 bg-slate-900/55 p-5 opacity-85">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">Planeado</span>
+          <i class="ph ph-sparkle text-3xl text-amber-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Asistente Virtual</h2>
+        <p class="mt-3 text-sm leading-6 text-slate-400">Agenda, notas, documentos, recordatorios y delegacion a agentes bajo confirmacion.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-slate-500">Pendiente</span>
+      </article>
+
+      <article class="flex min-h-56 flex-col rounded-2xl border border-indigo-500/20 bg-slate-900/55 p-5 opacity-85">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">Planeado</span>
+          <i class="ph ph-identification-card text-3xl text-indigo-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Portfolio</h2>
+        <p class="mt-3 text-sm leading-6 text-slate-400">Integracion futura del portfolio publico, proyectos, CV y curadoria profesional.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-slate-500">Pendiente</span>
+      </article>
+
+      <article class="flex min-h-56 flex-col rounded-2xl border border-fuchsia-500/20 bg-slate-900/55 p-5 opacity-85">
+        <div class="flex items-center justify-between gap-3">
+          <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300">Planeado</span>
+          <i class="ph ph-network text-3xl text-fuchsia-200"></i>
+        </div>
+        <h2 class="mt-5 text-xl font-black text-white">Agentes / Orquestador</h2>
+        <p class="mt-3 text-sm leading-6 text-slate-400">Entrada futura para PicoClaw, subagentes y `/api/orchestrator/chat` desde FastAPI.</p>
+        <span class="mt-auto pt-5 text-sm font-bold text-slate-500">Pendiente</span>
       </article>
     </section>
 
-    <footer class="mt-auto pt-10 text-xs text-slate-500">
-      Frontend publico sin secretos. Las llaves y memoria persistente viven en la Jetson.
+    <footer class="mt-auto pt-8 text-xs leading-6 text-slate-500">
+      Frontend publico sin secretos. Las llaves, sesiones, memoria persistente y acciones sensibles viven detras de la API en la Jetson.
     </footer>
   </main>
+
+  <script>
+    const API_BASE = window.JETSON_API_BASE || "";
+    async function checkApi() {
+      const status = document.getElementById("api-status");
+      const dot = document.getElementById("api-dot");
+      if (!API_BASE) {
+        status.textContent = "Sin configurar";
+        dot.className = "h-2.5 w-2.5 rounded-full bg-red-400";
+        return;
+      }
+      try {
+        const response = await fetch(`${API_BASE}/api/health`);
+        if (!response.ok) throw new Error("health");
+        const data = await response.json();
+        status.textContent = data.status === "ok" ? "En linea" : "Revisar";
+        dot.className = `h-2.5 w-2.5 rounded-full ${data.status === "ok" ? "bg-emerald-400" : "bg-amber-400"}`;
+      } catch (_) {
+        status.textContent = "No disponible";
+        dot.className = "h-2.5 w-2.5 rounded-full bg-red-400";
+      }
+    }
+    checkApi();
+  </script>
 </body>
+
 </html>

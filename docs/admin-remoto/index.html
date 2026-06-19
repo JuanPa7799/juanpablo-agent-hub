@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Remoto - Juan Pablo Agent Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="../config.js"></script>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .glass { background: rgba(15, 23, 42, .82); border: 1px solid rgba(148, 163, 184, .16); box-shadow: 0 24px 80px rgba(2, 6, 23, .28); backdrop-filter: blur(14px); }
+    .view { display: none; }
+    .view.active { display: block; }
+    .nav.active { border-color: rgba(96, 165, 250, .55); background: linear-gradient(90deg, rgba(37, 99, 235, .2), rgba(147, 51, 234, .16)); color: #dbeafe; }
+    .mono-box { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <div class="pointer-events-none fixed inset-0 opacity-60" aria-hidden="true">
+    <div class="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_25%_20%,rgba(37,99,235,.28),transparent_32%),radial-gradient(circle_at_78%_8%,rgba(147,51,234,.24),transparent_28%)]"></div>
+  </div>
+
+  <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/92 px-4 backdrop-blur">
+    <form class="glass w-full max-w-md rounded-2xl p-6 sm:p-8" onsubmit="handleLogin(event)">
+      <a href="../" class="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-2 text-xs font-bold text-slate-300 hover:border-blue-400 hover:text-white">
+        <i class="ph ph-arrow-left"></i> Volver al portal
+      </a>
+      <div class="mt-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600">
+        <i class="ph-bold ph-shield-check text-3xl text-white"></i>
+      </div>
+      <h1 class="mt-5 text-3xl font-black tracking-tight text-white">Admin Remoto</h1>
+      <p class="mt-2 text-sm leading-6 text-slate-300">Acceso privado para revisar Jetson, PicoClaw, FastAPI y Cloudflare con acciones guiadas.</p>
+
+      <label class="mt-7 block text-xs font-bold uppercase tracking-[0.22em] text-slate-400" for="login-user">Usuario</label>
+      <input id="login-user" class="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-400" autocomplete="username" placeholder="usuario">
+
+      <label class="mt-5 block text-xs font-bold uppercase tracking-[0.22em] text-slate-400" for="login-pass">Password</label>
+      <input id="login-pass" type="password" class="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-400" autocomplete="current-password" placeholder="password">
+
+      <div id="login-error" class="mt-5 hidden rounded-xl border border-red-800 bg-red-950/60 px-4 py-3 text-sm font-semibold text-red-200"></div>
+      <button class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 font-bold text-white transition hover:from-blue-500 hover:to-violet-500">
+        Entrar seguro <i class="ph-bold ph-arrow-right"></i>
+      </button>
+    </form>
+  </div>
+
+  <div class="relative flex min-h-screen">
+    <div id="mobile-shade" class="fixed inset-0 z-30 hidden bg-slate-950/70 backdrop-blur-sm lg:hidden" onclick="toggleMenu(false)"></div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col border-r border-slate-800 bg-slate-950 p-5 transition-transform lg:translate-x-0">
+      <div class="mb-6 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-700">
+            <i class="ph-bold ph-hard-drives text-2xl text-white"></i>
+          </div>
+          <div>
+            <p class="font-black text-white">Admin Remoto</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-300">Seguro V1</p>
+          </div>
+        </div>
+        <button class="rounded-lg border border-slate-800 p-2 text-slate-300 lg:hidden" onclick="toggleMenu(false)" aria-label="Cerrar menu">
+          <i class="ph-bold ph-x text-xl"></i>
+        </button>
+      </div>
+
+      <nav class="flex-1 space-y-2 overflow-y-auto pr-1" aria-label="Secciones">
+        <button class="nav active flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-slate-900" data-view="estado"><i class="ph ph-activity text-lg"></i> Estado</button>
+        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-slate-900" data-view="servicios"><i class="ph ph-plugs text-lg"></i> Servicios</button>
+        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-slate-900" data-view="picoclaw"><i class="ph ph-robot text-lg"></i> PicoClaw</button>
+        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-red-300 hover:bg-red-950/30" data-view="terminal"><i class="ph ph-terminal text-lg"></i> Terminal Segura</button>
+        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-slate-900" data-view="logs"><i class="ph ph-text-align-left text-lg"></i> Logs</button>
+        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-slate-900" data-view="backups"><i class="ph ph-database text-lg"></i> Backups</button>
+        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-bold text-slate-300 hover:bg-slate-900" data-view="auditoria"><i class="ph ph-shield-check text-lg"></i> Auditoria</button>
+      </nav>
+
+      <div class="mt-5 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+        <p class="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Conexion</p>
+        <div class="mt-3 flex items-center gap-2">
+          <span id="status-dot" class="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+          <span id="api-status" class="text-sm font-bold text-amber-200">Sin verificar</span>
+        </div>
+        <button class="mt-4 text-left text-xs font-bold text-red-300 hover:text-red-200" onclick="logout()">
+          <i class="ph ph-sign-out"></i> Cerrar sesion
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex min-h-screen w-full flex-col lg:ml-72">
+      <header class="sticky top-0 z-20 border-b border-slate-800 bg-slate-950/90 px-4 py-3 backdrop-blur lg:hidden">
+        <div class="flex items-center justify-between">
+          <button class="rounded-xl border border-slate-800 p-2 text-slate-200" onclick="toggleMenu(true)" aria-label="Abrir menu"><i class="ph-bold ph-list text-2xl"></i></button>
+          <p class="font-black text-white">Admin Remoto</p>
+          <a href="../" class="rounded-xl border border-slate-800 p-2 text-slate-200" aria-label="Portal"><i class="ph-bold ph-house text-xl"></i></a>
+        </div>
+      </header>
+
+      <div class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <section class="glass mb-6 rounded-2xl p-5 sm:p-6">
+          <div class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.28em] text-blue-300">Jetson Nano + PicoClaw</p>
+              <h2 id="view-title" class="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">Estado</h2>
+              <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-300">Panel privado de diagnostico. Las acciones sensibles esperan endpoints backend seguros y auditados.</p>
+            </div>
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <button class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-slate-200 hover:border-blue-400" onclick="refreshAll()">
+                <i class="ph ph-arrow-clockwise"></i> Actualizar
+              </button>
+              <a href="../productividad/" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500">
+                <i class="ph ph-briefcase"></i> Productividad
+              </a>
+              <a href="../" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-slate-200 hover:border-blue-400">
+                <i class="ph ph-arrow-left"></i> Portal
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-estado" class="view active space-y-5">
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <article class="glass rounded-2xl p-5"><p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">FastAPI</p><h3 id="metric-api" class="mt-3 text-2xl font-black text-white">Pendiente</h3><p id="metric-api-detail" class="mt-2 text-sm text-slate-400">Usa /api/health.</p></article>
+            <article class="glass rounded-2xl p-5"><p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">OpenRouter</p><h3 id="metric-ai" class="mt-3 text-2xl font-black text-white">Pendiente</h3><p id="metric-model" class="mt-2 text-sm text-slate-400">Modelo no verificado.</p></article>
+            <article class="glass rounded-2xl p-5"><p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Admin API</p><h3 id="metric-admin" class="mt-3 text-2xl font-black text-amber-200">Pendiente</h3><p class="mt-2 text-sm text-slate-400">/api/admin/* fase backend.</p></article>
+            <article class="glass rounded-2xl p-5"><p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Ultima revision</p><h3 id="metric-updated" class="mt-3 text-2xl font-black text-white">Nunca</h3><p class="mt-2 text-sm text-slate-400">Sin polling continuo.</p></article>
+          </div>
+          <div class="grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
+            <article class="glass rounded-2xl p-5">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h3 class="text-xl font-black text-white">Resumen seguro</h3>
+                <button class="rounded-xl border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-blue-400" onclick="diagnoseWithAI()">Diagnosticar con IA</button>
+              </div>
+              <div id="health-output" class="mono-box mt-4 min-h-40 overflow-x-auto rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">Pulsa Actualizar para revisar la API.</div>
+            </article>
+            <article class="glass rounded-2xl p-5">
+              <h3 class="text-xl font-black text-white">Incidentes locales</h3>
+              <p class="mt-2 text-sm text-slate-400">Se guardan en /api/state/admin-remoto cuando hay sesion.</p>
+              <textarea id="incident-text" class="mt-4 h-28 w-full resize-none rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm text-slate-100 outline-none focus:border-blue-400" placeholder="Ej. Revisar cloudflared porque el dashboard marco error..."></textarea>
+              <button class="mt-3 w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white hover:bg-violet-500" onclick="saveIncident()">Guardar incidente</button>
+            </article>
+          </div>
+        </section>
+
+        <section id="view-servicios" class="view space-y-5">
+          <div id="services-grid" class="grid gap-4 lg:grid-cols-3"></div>
+        </section>
+
+        <section id="view-picoclaw" class="view space-y-5">
+          <article class="glass rounded-2xl p-5">
+            <h3 class="text-xl font-black text-white">Mensaje a PicoClaw</h3>
+            <p class="mt-2 text-sm text-slate-400">Intenta `/api/admin/picoclaw/message`; si no existe, muestra pendiente. Para IA general usa `/api/ai/chat` bajo demanda.</p>
+            <textarea id="picoclaw-prompt" class="mt-4 h-32 w-full resize-none rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm text-slate-100 outline-none focus:border-blue-400" placeholder="Describe el diagnostico que necesitas..."></textarea>
+            <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+              <button class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500" onclick="sendPicoClaw()">Enviar a endpoint admin</button>
+              <button class="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-slate-200 hover:border-violet-400" onclick="askAI()">Fallback IA</button>
+            </div>
+            <div id="picoclaw-output" class="mono-box mt-4 min-h-32 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">Sin mensajes.</div>
+          </article>
+        </section>
+
+        <section id="view-terminal" class="view space-y-5">
+          <article class="rounded-2xl border border-red-900/60 bg-red-950/30 p-5">
+            <h3 class="text-xl font-black text-red-100">Terminal Segura V1</h3>
+            <p class="mt-2 text-sm leading-6 text-red-200">No hay terminal libre. Solo se preparan comandos de lectura permitidos para `/api/admin/terminal/run`.</p>
+          </article>
+          <article class="glass rounded-2xl p-5">
+            <div id="command-list" class="flex flex-wrap gap-2"></div>
+            <pre id="terminal-output" class="mono-box mt-5 min-h-56 overflow-x-auto whitespace-pre-wrap rounded-xl border border-slate-800 bg-black p-4 text-sm leading-6 text-emerald-300">Selecciona un comando permitido.</pre>
+          </article>
+        </section>
+
+        <section id="view-logs" class="view space-y-5">
+          <article class="glass rounded-2xl p-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div class="flex-1">
+                <label for="log-service" class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Servicio</label>
+                <select id="log-service" class="mt-2 w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-100 outline-none focus:border-blue-400">
+                  <option value="fastapi">FastAPI</option>
+                  <option value="cloudflared">Cloudflare Tunnel</option>
+                  <option value="picoclaw">PicoClaw</option>
+                </select>
+              </div>
+              <button class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-500" onclick="fetchLogs()">Cargar logs</button>
+              <button class="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-slate-200 hover:border-violet-400" onclick="analyzeLogs()">Analizar con IA</button>
+            </div>
+            <pre id="log-output" class="mono-box mt-5 min-h-56 overflow-x-auto whitespace-pre-wrap rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm leading-6 text-slate-300">Selecciona un servicio. Los logs reales requieren backend sanitizado.</pre>
+          </article>
+        </section>
+
+        <section id="view-backups" class="view space-y-5">
+          <article class="glass rounded-2xl p-5">
+            <h3 class="text-xl font-black text-white">Backups seguros</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-400">La solicitud real queda para `/api/admin/backups` en backend. No se descargan secretos desde el navegador.</p>
+            <button class="mt-4 rounded-xl border border-amber-700 bg-amber-950/40 px-4 py-3 text-sm font-bold text-amber-100 hover:border-amber-400" onclick="requestBackup()">Solicitar respaldo seguro</button>
+            <div id="backup-output" class="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-300">Sin solicitudes.</div>
+          </article>
+        </section>
+
+        <section id="view-auditoria" class="view space-y-5">
+          <article class="glass rounded-2xl p-5">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <h3 class="text-xl font-black text-white">Auditoria resumida</h3>
+              <button class="rounded-xl border border-slate-700 px-4 py-2 text-sm font-bold text-slate-200 hover:border-blue-400" onclick="loadAdminAudit()">Consultar backend</button>
+            </div>
+            <div id="audit-list" class="mt-5 space-y-3"></div>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="pointer-events-none fixed bottom-4 left-4 right-4 z-50 mx-auto hidden max-w-lg rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-2xl"></div>
+
+  <script>
+    const API_BASE = window.JETSON_API_BASE || "";
+    const APP_ID = "admin-remoto";
+    const SESSION_TOKEN_KEY = "agent_hub_session_token";
+    const DATA_KEY = "agent_hub_admin_remoto_state_v1";
+    const allowedCommands = ["uptime", "df -h", "free -h", "docker ps", "systemctl status cloudflared", "ps aux", "ss -tulpn"];
+    const serviceSeeds = [
+      { id: "fastapi", name: "FastAPI", detail: "Backend principal /api" },
+      { id: "cloudflared", name: "Cloudflare Tunnel", detail: "Entrada publica api.juanpablogc.com" },
+      { id: "picoclaw", name: "PicoClaw", detail: "Orquestador y agentes" }
+    ];
+    const defaultState = { incidents: [], audit: [], preferences: { view: "estado" }, lastHealth: null };
+    let sessionToken = localStorage.getItem(SESSION_TOKEN_KEY) || "";
+    let authenticated = false;
+    let state = loadLocalState();
+    let latestLogs = "";
+
+    function loadLocalState() {
+      try { return { ...defaultState, ...JSON.parse(localStorage.getItem(DATA_KEY) || "{}") }; }
+      catch (_) { return JSON.parse(JSON.stringify(defaultState)); }
+    }
+
+    async function apiFetch(path, options = {}) {
+      if (!API_BASE) throw new Error("API no configurada");
+      const response = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(sessionToken ? { "X-Session-Token": sessionToken } : {}),
+          ...(options.headers || {})
+        },
+        credentials: "include"
+      });
+      if (!response.ok) {
+        const error = new Error(response.status === 404 ? "pendiente de backend" : "error de API");
+        error.status = response.status;
+        throw error;
+      }
+      return response.json();
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const error = document.getElementById("login-error");
+      error.classList.add("hidden");
+      try {
+        const result = await apiFetch("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            username: document.getElementById("login-user").value.trim(),
+            password: document.getElementById("login-pass").value
+          })
+        });
+        sessionToken = result.session_token || result.token || "";
+        if (sessionToken) localStorage.setItem(SESSION_TOKEN_KEY, sessionToken);
+        authenticated = true;
+        document.getElementById("login-overlay").classList.add("hidden");
+        await loadState();
+        await refreshAll();
+      } catch (err) {
+        error.textContent = err.status === 401 ? "Credenciales incorrectas." : `No se pudo conectar con Jetson (${API_BASE || "sin URL"}).`;
+        error.classList.remove("hidden");
+      }
+    }
+
+    async function checkSession() {
+      if (!sessionToken) return;
+      try {
+        const status = await apiFetch("/api/auth/status");
+        if (status.authenticated) {
+          authenticated = true;
+          document.getElementById("login-overlay").classList.add("hidden");
+          await loadState();
+          await refreshAll();
+        }
+      } catch (_) {
+        authenticated = false;
+      }
+    }
+
+    async function logout() {
+      try { await apiFetch("/api/auth/logout", { method: "POST", body: "{}" }); } catch (_) {}
+      sessionToken = "";
+      authenticated = false;
+      localStorage.removeItem(SESSION_TOKEN_KEY);
+      document.getElementById("login-pass").value = "";
+      document.getElementById("login-overlay").classList.remove("hidden");
+    }
+
+    async function loadState() {
+      state = loadLocalState();
+      try {
+        const remote = await apiFetch(`/api/state/${APP_ID}`);
+        if (remote.state) state = { ...defaultState, ...remote.state };
+        localStorage.setItem(DATA_KEY, JSON.stringify(state));
+      } catch (_) {
+        setApiStatus("Estado local", false);
+      }
+      renderAudit();
+    }
+
+    async function saveState() {
+      localStorage.setItem(DATA_KEY, JSON.stringify(state));
+      if (!authenticated) return;
+      try { await apiFetch(`/api/state/${APP_ID}`, { method: "PUT", body: JSON.stringify({ state }) }); }
+      catch (_) { setApiStatus("Guardado local", false); }
+    }
+
+    async function refreshAll() {
+      await refreshHealth();
+      await probeAdminHealth();
+      renderServices();
+      renderCommands();
+      renderAudit();
+    }
+
+    async function refreshHealth() {
+      try {
+        const health = await apiFetch("/api/health");
+        state.lastHealth = { ...health, checked_at: new Date().toISOString() };
+        document.getElementById("metric-api").textContent = health.status === "ok" ? "OK" : "Revisar";
+        document.getElementById("metric-api-detail").textContent = `DB: ${health.database || "no reportada"}`;
+        document.getElementById("metric-ai").textContent = health.openrouter_configured ? "Configurado" : "Sin llave";
+        document.getElementById("metric-model").textContent = health.model || "Modelo no reportado";
+        document.getElementById("metric-updated").textContent = new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+        document.getElementById("health-output").textContent = JSON.stringify(safeHealth(health), null, 2);
+        setApiStatus("Jetson conectada", true);
+        await saveState();
+      } catch (err) {
+        setApiStatus("API no disponible", false);
+        document.getElementById("metric-api").textContent = "Error";
+        document.getElementById("health-output").textContent = `No se pudo leer /api/health: ${err.message}`;
+      }
+    }
+
+    async function probeAdminHealth() {
+      try {
+        const data = await apiFetch("/api/admin/health");
+        document.getElementById("metric-admin").textContent = data.status || "OK";
+        document.getElementById("metric-admin").className = "mt-3 text-2xl font-black text-emerald-200";
+      } catch (_) {
+        document.getElementById("metric-admin").textContent = "Pendiente";
+        document.getElementById("metric-admin").className = "mt-3 text-2xl font-black text-amber-200";
+      }
+    }
+
+    function safeHealth(health) {
+      return {
+        status: health.status,
+        openrouter_configured: Boolean(health.openrouter_configured),
+        model: health.model || null,
+        database_reported: Boolean(health.database)
+      };
+    }
+
+    function renderServices() {
+      const root = document.getElementById("services-grid");
+      root.innerHTML = serviceSeeds.map(service => `
+        <article class="glass rounded-2xl p-5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">${escapeHtml(service.id)}</p>
+              <h3 class="mt-2 text-xl font-black text-white">${escapeHtml(service.name)}</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-400">${escapeHtml(service.detail)}</p>
+            </div>
+            <span class="rounded-full border border-amber-800 bg-amber-950/50 px-3 py-1 text-xs font-bold text-amber-200">pendiente</span>
+          </div>
+          <div class="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <button class="rounded-xl border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 hover:border-blue-400" onclick="checkService('${service.id}')">Revisar</button>
+            <button class="rounded-xl border border-red-900/70 px-3 py-2 text-sm font-bold text-red-200 hover:border-red-400" onclick="restartService('${service.id}')">Reinicio guiado</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderCommands() {
+      document.getElementById("command-list").innerHTML = allowedCommands.map(cmd => `
+        <button class="rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-bold text-slate-200 hover:border-emerald-400" onclick="runSafeCommand('${escapeAttr(cmd)}')">${escapeHtml(cmd)}</button>
+      `).join("");
+    }
+
+    async function checkService(serviceId) {
+      try {
+        const data = await apiFetch(`/api/admin/services`);
+        logAudit("Servicios", `Revision ${serviceId}`, "OK");
+        toast("Servicios recibidos");
+        console.info(data);
+      } catch (err) {
+        logAudit("Servicios", `Revision ${serviceId}`, "pendiente de backend");
+        toast("Endpoint /api/admin/services pendiente de backend");
+      }
+    }
+
+    async function restartService(serviceId) {
+      if (!confirm(`Confirmar solicitud de reinicio guiado para ${serviceId}. No se ejecutara si el backend no existe.`)) return;
+      try {
+        await apiFetch(`/api/admin/services/${serviceId}/restart`, { method: "POST", body: JSON.stringify({ confirm: true }) });
+        logAudit("Servicios", `Restart ${serviceId}`, "Solicitado");
+        toast("Solicitud enviada");
+      } catch (_) {
+        logAudit("Servicios", `Restart ${serviceId}`, "pendiente de backend");
+        toast("Reinicio pendiente de backend");
+      }
+    }
+
+    async function sendPicoClaw() {
+      const prompt = document.getElementById("picoclaw-prompt").value.trim();
+      if (!prompt) return toast("Escribe un mensaje");
+      setOutput("picoclaw-output", "Enviando a /api/admin/picoclaw/message...");
+      try {
+        const data = await apiFetch("/api/admin/picoclaw/message", { method: "POST", body: JSON.stringify({ prompt, app_id: APP_ID }) });
+        setOutput("picoclaw-output", data.response || data.message || JSON.stringify(data, null, 2));
+        logAudit("PicoClaw", "Mensaje enviado", "OK");
+      } catch (_) {
+        setOutput("picoclaw-output", "pendiente de backend: /api/admin/picoclaw/message");
+        logAudit("PicoClaw", "Mensaje enviado", "pendiente de backend");
+      }
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById("picoclaw-prompt").value.trim();
+      if (!prompt) return toast("Escribe un mensaje");
+      setOutput("picoclaw-output", "Consultando /api/ai/chat bajo demanda...");
+      try {
+        const data = await apiFetch("/api/ai/chat", {
+          method: "POST",
+          body: JSON.stringify({
+            prompt,
+            system_prompt: "Eres el Agente Admin Remoto de Juan Pablo. Da diagnosticos seguros, breves, sin secretos y sin acciones destructivas.",
+            is_json: false
+          })
+        });
+        setOutput("picoclaw-output", data.text || data.response || data.message || "");
+        logAudit("IA", "Fallback admin", "OK");
+      } catch (err) {
+        setOutput("picoclaw-output", `Error IA: ${err.message}`);
+      }
+    }
+
+    async function runSafeCommand(command) {
+      if (!allowedCommands.includes(command)) return;
+      const out = document.getElementById("terminal-output");
+      out.textContent = `jetson:~$ ${command}\nEsperando backend seguro...`;
+      try {
+        const data = await apiFetch("/api/admin/terminal/run", { method: "POST", body: JSON.stringify({ command }) });
+        out.textContent = `jetson:~$ ${command}\n${data.output || data.summary || JSON.stringify(data, null, 2)}`;
+        logAudit("Terminal", command, "OK");
+      } catch (_) {
+        out.textContent = `jetson:~$ ${command}\npendiente de backend: /api/admin/terminal/run\nNo se ejecuto ningun comando desde el navegador.`;
+        logAudit("Terminal", command, "pendiente de backend");
+      }
+    }
+
+    async function fetchLogs() {
+      const service = document.getElementById("log-service").value;
+      const out = document.getElementById("log-output");
+      out.textContent = `Cargando logs sanitizados de ${service}...`;
+      try {
+        const data = await apiFetch(`/api/admin/logs/${service}`);
+        latestLogs = data.logs || data.summary || JSON.stringify(data, null, 2);
+        out.textContent = latestLogs;
+        logAudit("Logs", service, "OK");
+      } catch (_) {
+        latestLogs = `pendiente de backend: /api/admin/logs/${service}\nLos logs reales deben venir sanitizados y limitados desde FastAPI.`;
+        out.textContent = latestLogs;
+        logAudit("Logs", service, "pendiente de backend");
+      }
+    }
+
+    async function analyzeLogs() {
+      const content = latestLogs || document.getElementById("log-output").textContent;
+      if (!content || content.includes("Selecciona un servicio")) return toast("Carga logs primero");
+      document.getElementById("log-output").textContent = `${content}\n\n[IA] Analizando bajo demanda...`;
+      try {
+        const data = await apiFetch("/api/ai/chat", {
+          method: "POST",
+          body: JSON.stringify({
+            prompt: `Analiza estos logs o estado pendiente sin inventar datos. Si el backend esta pendiente, dilo claro:\n\n${content}`,
+            system_prompt: "Eres un DevOps seguro. No reveles secretos. Da diagnostico breve y siguiente accion.",
+            is_json: false
+          })
+        });
+        document.getElementById("log-output").textContent = `${content}\n\nAnalisis IA:\n${data.text || data.response || data.message || ""}`;
+        logAudit("IA Logs", "Analisis", "OK");
+      } catch (err) {
+        document.getElementById("log-output").textContent = `${content}\n\nError IA: ${err.message}`;
+      }
+    }
+
+    async function requestBackup() {
+      if (!confirm("Solicitar respaldo seguro. El backend debe excluir secretos. Continuar?")) return;
+      try {
+        const data = await apiFetch("/api/admin/backups", { method: "POST", body: JSON.stringify({ safe: true }) });
+        document.getElementById("backup-output").textContent = data.summary || JSON.stringify(data, null, 2);
+        logAudit("Backups", "Solicitud", "OK");
+      } catch (_) {
+        document.getElementById("backup-output").textContent = "pendiente de backend: /api/admin/backups";
+        logAudit("Backups", "Solicitud", "pendiente de backend");
+      }
+    }
+
+    async function loadAdminAudit() {
+      try {
+        const data = await apiFetch("/api/admin/audit");
+        toast("Auditoria backend recibida");
+        logAudit("Auditoria", "Consulta backend", "OK");
+        console.info(data);
+      } catch (_) {
+        toast("Auditoria backend pendiente");
+        logAudit("Auditoria", "Consulta backend", "pendiente de backend");
+      }
+    }
+
+    async function diagnoseWithAI() {
+      const healthText = document.getElementById("health-output").textContent;
+      document.getElementById("health-output").textContent = `${healthText}\n\n[IA] Diagnosticando...`;
+      try {
+        const data = await apiFetch("/api/ai/chat", {
+          method: "POST",
+          body: JSON.stringify({
+            prompt: `Diagnostica este estado del Agent Hub sin inventar metricas:\n${healthText}`,
+            system_prompt: "Eres el Agente Admin Remoto. Prioriza diagnosticos seguros, comandos de solo lectura y siguiente accion breve.",
+            is_json: false
+          })
+        });
+        document.getElementById("health-output").textContent = `${healthText}\n\nDiagnostico IA:\n${data.text || data.response || data.message || ""}`;
+        logAudit("IA", "Diagnostico estado", "OK");
+      } catch (err) {
+        document.getElementById("health-output").textContent = `${healthText}\n\nError IA: ${err.message}`;
+      }
+    }
+
+    function saveIncident() {
+      const text = document.getElementById("incident-text").value.trim();
+      if (!text) return toast("Escribe un incidente");
+      state.incidents.unshift({ id: crypto.randomUUID(), text, created_at: new Date().toISOString(), status: "abierto" });
+      document.getElementById("incident-text").value = "";
+      logAudit("Incidente", text.slice(0, 42), "Guardado");
+      saveState();
+      toast("Incidente guardado");
+    }
+
+    function logAudit(module, action, result) {
+      state.audit = state.audit || [];
+      state.audit.unshift({ id: crypto.randomUUID(), module, action, result, created_at: new Date().toISOString() });
+      state.audit = state.audit.slice(0, 60);
+      renderAudit();
+      saveState();
+    }
+
+    function renderAudit() {
+      const audit = state.audit || [];
+      const incidents = state.incidents || [];
+      document.getElementById("audit-list").innerHTML = [
+        ...incidents.slice(0, 4).map(item => ({ module: "Incidente", action: item.text, result: item.status, created_at: item.created_at })),
+        ...audit.slice(0, 12)
+      ].map(item => `
+        <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p class="font-bold text-white">${escapeHtml(item.module)}</p>
+            <span class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">${new Date(item.created_at).toLocaleString("es-MX")}</span>
+          </div>
+          <p class="mt-2 text-sm text-slate-300">${escapeHtml(item.action)}</p>
+          <p class="mt-1 text-xs font-bold text-blue-300">${escapeHtml(item.result)}</p>
+        </div>
+      `).join("") || '<p class="rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-400">Sin auditoria local todavia.</p>';
+    }
+
+    function setApiStatus(text, ok) {
+      document.getElementById("api-status").textContent = text;
+      document.getElementById("api-status").className = `text-sm font-bold ${ok ? "text-emerald-300" : "text-amber-200"}`;
+      document.getElementById("status-dot").className = `h-2.5 w-2.5 rounded-full ${ok ? "bg-emerald-400" : "bg-amber-400"}`;
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === `view-${viewId}`));
+      document.querySelectorAll(".nav").forEach(btn => btn.classList.toggle("active", btn.dataset.view === viewId));
+      const titles = { estado: "Estado", servicios: "Servicios", picoclaw: "PicoClaw", terminal: "Terminal Segura", logs: "Logs", backups: "Backups", auditoria: "Auditoria" };
+      document.getElementById("view-title").textContent = titles[viewId] || "Admin Remoto";
+      state.preferences = { ...(state.preferences || {}), view: viewId };
+      saveState();
+      toggleMenu(false);
+    }
+
+    function toggleMenu(open) {
+      document.getElementById("sidebar").classList.toggle("-translate-x-full", !open);
+      document.getElementById("mobile-shade").classList.toggle("hidden", !open);
+    }
+
+    function toast(message) {
+      const box = document.getElementById("toast");
+      box.textContent = message;
+      box.classList.remove("hidden");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => box.classList.add("hidden"), 2600);
+    }
+
+    function setOutput(id, text) {
+      document.getElementById(id).textContent = text || "";
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char]));
+    }
+
+    function escapeAttr(value) {
+      return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
+    document.querySelectorAll(".nav").forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.view)));
+    renderServices();
+    renderCommands();
+    renderAudit();
+    checkSession();
+  </script>
+</body>
+
+</html>

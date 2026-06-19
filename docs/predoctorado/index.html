@@ -138,6 +138,24 @@
                 transform: rotate(360deg);
             }
         }
+
+        *,::before,::after {
+            box-sizing: border-box;
+        }
+
+        input,select,textarea,button {
+            max-width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .glass-panel {
+                border-radius: 0;
+            }
+
+            .tab-content.active {
+                animation-duration: 0.2s;
+            }
+        }
     </style>
 </head>
 
@@ -157,7 +175,7 @@
         </div>
 
         <div
-            class="relative z-10 bg-slate-800/80 backdrop-blur-xl border border-slate-700 p-10 rounded-[2rem] shadow-2xl w-full max-w-md">
+            class="relative z-10 bg-slate-800/80 backdrop-blur-xl border border-slate-700 p-6 sm:p-10 rounded-2xl sm:rounded-[2rem] shadow-2xl w-full max-w-md">
             <div class="text-center mb-8">
                 <div
                     class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform rotate-3">
@@ -322,7 +340,7 @@
 
         <!-- Header superior -->
         <header
-            class="h-16 glass-panel flex items-center justify-between px-8 z-10 border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm">
+            class="hidden h-16 glass-panel items-center justify-between px-4 sm:flex sm:px-8 z-10 border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm">
             <h2 id="current-tab-title" class="text-lg font-semibold text-slate-800 dark:text-slate-200">Panel de Inicio
             </h2>
             <div class="flex items-center gap-4">
@@ -337,25 +355,25 @@
         </header>
 
         <!-- Contenido scrollable -->
-        <div class="flex-1 overflow-y-auto p-8 relative">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 relative">
             <div class="max-w-6xl mx-auto pb-12">
 
                 <!-- Tab 0: INICIO -->
                 <div id="tab-inicio" class="tab-content active">
                     <div
-                        class="p-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-[2rem] text-white shadow-xl mb-8 relative overflow-hidden">
+                        class="p-5 sm:p-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-2xl sm:rounded-[2rem] text-white shadow-xl mb-6 sm:mb-8 relative overflow-hidden">
                         <div class="absolute top-0 right-0 -mt-10 -mr-10 opacity-20">
                             <i class="ph-fill ph-brain text-[20rem]"></i>
                         </div>
                         <div class="relative z-10">
-                            <h2 class="text-4xl font-extrabold mb-3 tracking-tight">Sistema Activo y Potenciado por IA.
+                            <h2 class="text-3xl sm:text-4xl font-extrabold mb-3 tracking-tight">Sistema Activo y Potenciado por IA.
                             </h2>
-                            <p class="text-blue-100 text-lg mb-6 max-w-2xl leading-relaxed">
+                            <p class="text-blue-100 text-base sm:text-lg mb-6 max-w-2xl leading-relaxed">
                                 Tu entorno ahora cuenta con <strong>integraciones de Inteligencia Artificial</strong> y
                                 protección por contraseña. Puedes analizar artículos, mejorar tu redacción académica y
                                 desglosar tareas complejas con un solo clic en el icono ✨.
                             </p>
-                            <div class="flex gap-4">
+                            <div class="flex flex-wrap gap-3 sm:gap-4">
                                 <button onclick="aiPlanearDia()"
                                     class="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl backdrop-blur-md transition-all font-semibold flex items-center gap-2 border border-white/30">
                                     <i class="ph-fill ph-magic-wand"></i> Sugerir enfoque de hoy
