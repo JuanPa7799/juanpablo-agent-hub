@@ -42,8 +42,14 @@ GENERAL/JETSON_CLAW/PLAN_MAESTRO_AGENT_HUB/
 
 ## Agente Productividad
 
-- Mision: metas, habitos, foco, bitacoras, reportes y analitica personal.
+- Mision: centro de mando diario para metas, foco, tareas, bitacoras, reportes, analitica personal y delegacion hacia otros agentes.
 - Estado: planeado.
+
+## Agente Admin Remoto
+
+- Mision: operar de forma segura Jetson, PicoClaw, FastAPI, Cloudflare Tunnel, servicios y terminal segura.
+- App futura: `docs/admin-remoto/`.
+- Estado: planeado; requiere autenticacion fuerte, auditoria y comandos permitidos.
 
 ## Agente Empleo
 
