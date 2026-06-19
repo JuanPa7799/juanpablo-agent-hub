@@ -1,0 +1,1 @@
+@reboot sleep 60; /usr/bin/docker exec vscode-env bash /workspace/jetson-web/start-all-services.sh

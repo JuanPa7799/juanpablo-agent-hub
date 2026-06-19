@@ -1,5 +1,23 @@
 # Juan Pablo Agent Hub
 
+Portal publico:
+
+```text
+https://juanpablogc.com
+```
+
+API Jetson:
+
+```text
+https://api.juanpablogc.com
+```
+
+Runtime Jetson:
+
+```bash
+/workspace/jetson-web/start-all-services.sh
+```
+
 Portal maestro para paginas personales, productividad y agentes conectados a la Jetson Nano.
 
 ## Publicacion
