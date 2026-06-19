@@ -156,6 +156,12 @@
                 animation-duration: 0.2s;
             }
         }
+
+        @media (max-width: 1023px) {
+            #ai-sidebar.translate-x-full {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -234,13 +240,23 @@
 
 
     <!-- Sidebar Navegación Principal -->
-    <nav
-        class="w-64 glass-panel hidden lg:flex flex-col flex-shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-20 relative">
+    <div id="mobile-menu-overlay" class="fixed inset-0 z-30 hidden bg-slate-950/60 backdrop-blur-sm lg:hidden"
+        onclick="toggleMobileMenu(false)"></div>
+    <nav id="mobile-sidebar"
+        class="fixed inset-y-0 left-0 z-40 flex w-64 -translate-x-full flex-col flex-shrink-0 glass-panel shadow-2xl transition-transform duration-300 lg:relative lg:translate-x-0 lg:shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:lg:shadow-[4px_0_24px_rgba(0,0,0,0.2)]">
         <div class="p-6 border-b border-slate-100 dark:border-slate-800">
-            <h1 class="text-xl font-bold flex items-center gap-2 tracking-tight">
-                <i class="ph-fill ph-graduation-cap text-2xl text-blue-600 dark:text-blue-400"></i>
-                <span class="gradient-text">Predoctorado</span>
-            </h1>
+            <div class="flex items-center justify-between gap-3">
+                <h1 class="text-xl font-bold flex items-center gap-2 tracking-tight">
+                    <i class="ph-fill ph-graduation-cap text-2xl text-blue-600 dark:text-blue-400"></i>
+                    <span class="gradient-text">Predoctorado</span>
+                </h1>
+                <button onclick="toggleMobileMenu(false)"
+                    data-mobile-menu-close
+                    class="rounded-lg border border-slate-200 dark:border-slate-700 p-2 text-slate-500 dark:text-slate-300 lg:hidden"
+                    aria-label="Cerrar menu">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Investigación SBC & PQD</p>
         </div>
 
@@ -320,6 +336,11 @@
     <main class="flex-1 flex flex-col relative bg-[#f8fafc] dark:bg-slate-900/50 overflow-hidden">
         <div class="lg:hidden glass-panel border-b border-slate-200 dark:border-slate-800 p-3 z-20">
             <div class="flex items-center justify-between gap-3 mb-3">
+                <button onclick="toggleMobileMenu(true)"
+                    data-mobile-menu-open
+                    class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm font-bold text-blue-600 dark:text-blue-300">
+                    <i class="ph-bold ph-list"></i> Menu
+                </button>
                 <a href="../" class="flex items-center gap-2 text-sm font-bold text-blue-600 dark:text-blue-300">
                     <i class="ph ph-house"></i> Portal
                 </a>
@@ -1261,7 +1282,27 @@
             document.getElementById('current-tab-title').innerText = tabNames[tabId];
             const mobileSelect = document.getElementById('mobile-tab-select');
             if (mobileSelect && mobileSelect.value !== tabId) mobileSelect.value = tabId;
+            toggleMobileMenu(false);
         }
+
+        function toggleMobileMenu(open) {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            if (!sidebar || !overlay) return;
+            if (!open && window.innerWidth >= 1024) {
+                sidebar.style.transform = '';
+                sidebar.style.translate = '';
+                overlay.classList.add('hidden');
+                return;
+            }
+            sidebar.classList.toggle('-translate-x-full', !open);
+            sidebar.style.transform = open ? 'translateX(0)' : 'translateX(-100%)';
+            sidebar.style.translate = open ? '0' : '-100%';
+            overlay.classList.toggle('hidden', !open);
+        }
+
+        document.querySelectorAll('[data-mobile-menu-open]').forEach(btn => btn.addEventListener('click', () => toggleMobileMenu(true)));
+        document.querySelectorAll('[data-mobile-menu-close]').forEach(btn => btn.addEventListener('click', () => toggleMobileMenu(false)));
 
         // --- ASISTENTE COLAPSABLE ---
         let assistantOpen = false;

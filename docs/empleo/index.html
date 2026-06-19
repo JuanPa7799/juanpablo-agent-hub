@@ -46,19 +46,23 @@
   </div>
 
   <div class="flex min-h-screen">
-    <aside class="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-slate-800 bg-slate-950/96 p-5 lg:flex lg:flex-col">
-      <a href="../" class="mb-7 flex items-center gap-3">
-        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600"><i class="ph-bold ph-briefcase text-2xl text-white"></i></div>
-        <div><p class="font-bold text-white">JobAgent Hub</p><p class="text-xs uppercase tracking-widest text-slate-500">Data / ML Edition</p></div>
-      </a>
+    <div id="mobile-menu-overlay" class="fixed inset-0 z-30 hidden bg-slate-950/70 backdrop-blur-sm lg:hidden" onclick="toggleMobileMenu(false)"></div>
+    <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col border-r border-slate-800 bg-slate-950/96 p-5 shadow-2xl transition-transform duration-300 lg:translate-x-0 lg:shadow-none">
+      <div class="mb-7 flex items-center justify-between gap-3">
+        <a href="../" class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600"><i class="ph-bold ph-briefcase text-2xl text-white"></i></div>
+          <div><p class="font-bold text-white">JobAgent Hub</p><p class="text-xs uppercase tracking-widest text-slate-500">Data / ML Edition</p></div>
+        </a>
+        <button onclick="toggleMobileMenu(false)" data-mobile-menu-close class="rounded-lg border border-slate-800 p-2 text-slate-300 lg:hidden" aria-label="Cerrar menu"><i class="ph-bold ph-x text-xl"></i></button>
+      </div>
       <nav class="space-y-2">
-        <button class="nav active flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="dashboard"><i class="ph ph-squares-four"></i> Dashboard</button>
-        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="radar"><i class="ph ph-radar"></i> Radar</button>
-        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="cv"><i class="ph ph-file-text"></i> CV / Perfil</button>
-        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="kanban"><i class="ph ph-kanban"></i> Kanban</button>
-        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="entrevista"><i class="ph ph-chats-circle"></i> Entrevistas</button>
-        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="networking"><i class="ph ph-users-three"></i> Networking</button>
-        <button class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="bitacora"><i class="ph ph-notebook"></i> Bitacora</button>
+        <button onclick="switchView('dashboard')" class="nav active flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="dashboard"><i class="ph ph-squares-four"></i> Dashboard</button>
+        <button onclick="switchView('radar')" class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="radar"><i class="ph ph-radar"></i> Radar</button>
+        <button onclick="switchView('cv')" class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="cv"><i class="ph ph-file-text"></i> CV / Perfil</button>
+        <button onclick="switchView('kanban')" class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="kanban"><i class="ph ph-kanban"></i> Kanban</button>
+        <button onclick="switchView('entrevista')" class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="entrevista"><i class="ph ph-chats-circle"></i> Entrevistas</button>
+        <button onclick="switchView('networking')" class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="networking"><i class="ph ph-users-three"></i> Networking</button>
+        <button onclick="switchView('bitacora')" class="nav flex w-full items-center gap-3 rounded-xl border border-transparent px-4 py-3 text-left text-sm font-semibold text-slate-300" data-view="bitacora"><i class="ph ph-notebook"></i> Bitacora</button>
       </nav>
       <div class="mt-auto rounded-xl border border-slate-800 bg-slate-900 p-4"><p class="text-xs uppercase tracking-widest text-slate-500">Estado</p><p id="api-status" class="mt-2 text-sm font-semibold text-emerald-300">Jetson conectada</p><button onclick="logout()" class="mt-4 text-sm font-semibold text-slate-400 hover:text-white">Cerrar sesion</button></div>
     </aside>
@@ -66,6 +70,7 @@
     <main class="min-h-screen w-full px-4 py-5 lg:ml-72 lg:px-8">
       <div class="mb-4 rounded-2xl border border-slate-800 bg-slate-950/90 p-3 lg:hidden">
         <div class="mb-3 flex items-center justify-between gap-3">
+          <button onclick="toggleMobileMenu(true)" data-mobile-menu-open class="flex items-center gap-2 rounded-xl border border-slate-800 px-3 py-2 text-sm font-bold text-blue-300"><i class="ph-bold ph-list"></i> Menu</button>
           <a href="../" class="flex items-center gap-2 text-sm font-bold text-blue-300"><i class="ph ph-house"></i> Portal</a>
           <button onclick="logout()" class="text-sm font-semibold text-slate-400">Salir</button>
         </div>
@@ -239,8 +244,12 @@
       const mobileSelect = document.getElementById("mobile-view-select");
       if (mobileSelect && mobileSelect.value !== view) mobileSelect.value = view;
       document.getElementById("view-title").textContent = { dashboard:"Dashboard de empleo", radar:"Radar de oportunidades", cv:"CV / Perfil maestro", kanban:"Kanban de postulaciones", entrevista:"Simulador de entrevistas", networking:"Networking", bitacora:"Bitacora" }[view];
+      toggleMobileMenu(false);
       if (view === "dashboard") setTimeout(renderChart, 40);
     }
+    function toggleMobileMenu(open) { const sidebar = document.getElementById("mobile-sidebar"); const overlay = document.getElementById("mobile-menu-overlay"); if (!sidebar || !overlay) return; if (!open && window.innerWidth >= 1024) { sidebar.style.transform = ""; sidebar.style.translate = ""; overlay.classList.add("hidden"); return; } sidebar.classList.toggle("-translate-x-full", !open); sidebar.style.transform = open ? "translateX(0)" : "translateX(-100%)"; sidebar.style.translate = open ? "0" : "-100%"; overlay.classList.toggle("hidden", !open); }
+    document.querySelectorAll("[data-mobile-menu-open]").forEach(btn => btn.addEventListener("click", () => toggleMobileMenu(true)));
+    document.querySelectorAll("[data-mobile-menu-close]").forEach(btn => btn.addEventListener("click", () => toggleMobileMenu(false)));
 
     function renderAll() { renderMetrics(); renderChart(); renderRadar(); renderKanban(); renderHistory(); }
     function renderMetrics() {
