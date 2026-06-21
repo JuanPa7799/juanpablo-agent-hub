@@ -10,6 +10,7 @@ __pycache__/
 *.pyc
 backups/
 sessions/
+/apps/jetson-web/data/
 node_modules/
 .DS_Store
 Thumbs.db
