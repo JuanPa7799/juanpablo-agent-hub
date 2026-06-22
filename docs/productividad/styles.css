@@ -1,0 +1,98 @@
+body {
+  background: #0b0f19;
+  color: #e2e8f0;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 8px;
+}
+
+.glass {
+  background: rgba(15, 23, 42, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 24px 80px rgba(2, 6, 23, 0.22);
+}
+
+.nav.active {
+  background: linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0.2),
+    rgba(147, 51, 234, 0.18)
+  );
+  color: #bfdbfe;
+  border-color: rgba(96, 165, 250, 0.55);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #2563eb, #9333ea);
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(135deg, #1d4ed8, #7e22ce);
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.4;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.task-card {
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+.view {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .glass {
+    border-radius: 1rem;
+  }
+
+  #toast {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+}

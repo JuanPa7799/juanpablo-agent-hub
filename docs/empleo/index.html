@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,93 +10,89 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../config.js"></script>
   <script>
-    tailwind.config = { darkMode:"class", theme:{ extend:{ fontFamily:{ sans:["Inter","system-ui","sans-serif"] } } } };
+    tailwind.config = { darkMode: "class", theme: { extend: { fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] } } } };
   </script>
-  <style>
-    :root { color-scheme:dark; }
-    * { box-sizing:border-box; }
-    html,body { min-height:100%; overflow-x:hidden; }
-    body { margin:0; background:#08111f; color:#dbe5f2; font-family:Inter,system-ui,sans-serif; letter-spacing:0; }
-    button,input,select,textarea { font:inherit; letter-spacing:0; }
-    button { min-width:0; }
-    input,select,textarea { max-width:100%; }
-    ::-webkit-scrollbar { width:8px; height:8px; }
-    ::-webkit-scrollbar-track { background:#08111f; }
-    ::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
-    .panel { background:#111c2d; border:1px solid #25344b; border-radius:8px; box-shadow:0 18px 50px rgba(0,0,0,.18); }
-    .panel-muted { background:#0c1626; border:1px solid #203047; border-radius:8px; }
-    .nav.active { background:#132b42; color:#e0f2fe; border-color:#2d6b91; }
-    .nav { border:1px solid transparent; }
-    .btn-primary { background:#0f766e; border:1px solid #14b8a6; color:white; }
-    .btn-primary:hover { background:#0d9488; }
-    .btn-secondary { background:#111c2d; border:1px solid #3b4b63; color:#dbe5f2; }
-    .btn-secondary:hover { border-color:#38bdf8; color:white; }
-    .btn-danger { background:#3f1722; border:1px solid #9f334d; color:#fecdd3; }
-    .field { width:100%; border:1px solid #334155; border-radius:6px; background:#08111f; color:#f8fafc; padding:.72rem .8rem; outline:none; }
-    .field:focus { border-color:#38bdf8; box-shadow:0 0 0 2px rgba(56,189,248,.12); }
-    .field::placeholder { color:#64748b; }
-    .label { display:block; color:#b7c5d8; font-size:.78rem; font-weight:700; margin-bottom:.38rem; }
-    .badge { display:inline-flex; align-items:center; border:1px solid #334155; border-radius:999px; padding:.22rem .55rem; font-size:.72rem; font-weight:700; white-space:nowrap; }
-    .status-dot { width:7px; height:7px; border-radius:50%; background:#f59e0b; }
-    .status-dot.online { background:#22c55e; }
-    .view { min-width:0; }
-    .cv-page { width:100%; max-width:8.5in; min-height:11in; margin:auto; padding:.55in; background:#fff; color:#111; font-family:Arial,sans-serif; font-size:10pt; line-height:1.25; box-shadow:0 20px 60px rgba(0,0,0,.3); }
-    .cv-page h1 { margin:0; text-align:center; font-size:18pt; line-height:1.05; }
-    .cv-page h2 { margin:10px 0 4px; text-align:center; font-size:11pt; }
-    .cv-page h3 { margin:6px 0 1px; font-size:9.5pt; }
-    .cv-page p { margin:3px 0; }
-    .cv-page ul { margin:2px 0 4px; padding-left:20px; }
-    .cv-page .contact { text-align:center; font-size:9pt; }
-    .kanban-grid { display:grid; grid-template-columns:repeat(6,minmax(250px,1fr)); gap:12px; min-width:1580px; }
-    .toast-show { opacity:1!important; transform:translate(-50%,0)!important; }
-    @media (max-width:640px) {
-      .cv-page { min-height:auto; padding:1rem; font-size:9pt; }
-      .cv-page h1 { font-size:15pt; }
-      #toast { left:1rem; right:1rem; transform:translate(0,12px); }
-      #toast.toast-show { transform:translate(0,0)!important; }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <div id="login-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#08111f] px-4">
     <form onsubmit="handleLogin(event)" class="panel w-full max-w-sm p-6 sm:p-8">
-      <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-md border border-teal-500/40 bg-teal-500/10 text-2xl text-teal-300"><i class="ph-bold ph-briefcase"></i></div>
+      <div
+        class="mb-5 flex h-12 w-12 items-center justify-center rounded-md border border-teal-500/40 bg-teal-500/10 text-2xl text-teal-300">
+        <i class="ph-bold ph-briefcase"></i>
+      </div>
       <p class="text-xs font-bold uppercase text-sky-300">Juan Pablo Agent Hub</p>
       <h1 class="mt-2 text-2xl font-black text-white">Asistente de empleo</h1>
-      <p class="mt-2 text-sm text-slate-400">Tu información profesional y documentos se mantienen en la Jetson privada.</p>
+      <p class="mt-2 text-sm text-slate-400">Tu información profesional y documentos se mantienen en la Jetson privada.
+      </p>
       <label class="label mt-6" for="username">Usuario</label>
       <input id="username" class="field" autocomplete="username" required>
       <label class="label mt-3" for="password">Contraseña</label>
       <input id="password" class="field" type="password" autocomplete="current-password" required>
-      <p id="login-error" class="mt-3 hidden rounded-md border border-rose-900 bg-rose-950/50 p-3 text-sm text-rose-200"></p>
-      <button id="login-button" class="btn-primary mt-5 flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 font-bold"><i class="ph-bold ph-sign-in"></i> Entrar</button>
-      <a href="../" class="mt-4 block text-center text-sm font-semibold text-slate-400 hover:text-white">Volver al portal</a>
+      <p id="login-error"
+        class="mt-3 hidden rounded-md border border-rose-900 bg-rose-950/50 p-3 text-sm text-rose-200"></p>
+      <button id="login-button"
+        class="btn-primary mt-5 flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 font-bold"><i
+          class="ph-bold ph-sign-in"></i> Entrar</button>
+      <a href="../" class="mt-4 block text-center text-sm font-semibold text-slate-400 hover:text-white">Volver al
+        portal</a>
     </form>
   </div>
 
-  <div id="mobile-menu-overlay" onclick="toggleMobileMenu(false)" class="fixed inset-0 z-40 hidden bg-black/60 lg:hidden"></div>
-  <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 flex w-[286px] -translate-x-full flex-col border-r border-slate-800 bg-[#0b1524] p-4 transition-transform lg:translate-x-0">
+  <div id="mobile-menu-overlay" onclick="toggleMobileMenu(false)"
+    class="fixed inset-0 z-40 hidden bg-black/60 lg:hidden"></div>
+  <aside id="mobile-sidebar"
+    class="fixed inset-y-0 left-0 z-50 flex w-[286px] -translate-x-full flex-col border-r border-slate-800 bg-[#0b1524] p-4 transition-transform lg:translate-x-0">
     <div class="flex items-center justify-between gap-3 border-b border-slate-800 pb-4">
       <a href="../" class="flex min-w-0 items-center gap-3">
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-teal-600 text-xl text-white"><i class="ph-bold ph-briefcase"></i></span>
-        <span class="min-w-0"><strong class="block truncate text-sm text-white">Asistente de empleo</strong><span class="block text-xs text-slate-500">Agent Hub</span></span>
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-teal-600 text-xl text-white"><i
+            class="ph-bold ph-briefcase"></i></span>
+        <span class="min-w-0"><strong class="block truncate text-sm text-white">Asistente de empleo</strong><span
+            class="block text-xs text-slate-500">Agent Hub</span></span>
       </a>
-      <button data-mobile-menu-close onclick="toggleMobileMenu(false)" class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md lg:hidden" title="Cerrar menú"><i class="ph ph-x"></i></button>
+      <button data-mobile-menu-close onclick="toggleMobileMenu(false)"
+        class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md lg:hidden" title="Cerrar menú"><i
+          class="ph ph-x"></i></button>
     </div>
     <nav class="mt-5 space-y-1 overflow-y-auto" aria-label="Secciones">
-      <button class="nav active flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="dashboard" onclick="switchView('dashboard')"><i class="ph ph-house"></i> Resumen</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="radar" onclick="switchView('radar')"><i class="ph ph-radar"></i> Radar de vacantes</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="cv" onclick="switchView('cv')"><i class="ph ph-file-text"></i> CV y perfil profesional</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="seguimiento" onclick="switchView('seguimiento')"><i class="ph ph-columns"></i> Seguimiento</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="entrevista" onclick="switchView('entrevista')"><i class="ph ph-chats-circle"></i> Entrevistas</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="networking" onclick="switchView('networking')"><i class="ph ph-users-three"></i> Red de contactos</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="biblioteca" onclick="switchView('biblioteca')"><i class="ph ph-books"></i> Biblioteca profesional</button>
-      <button class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300" data-view="bitacora" onclick="switchView('bitacora')"><i class="ph ph-notebook"></i> Bitácora</button>
+      <button
+        class="nav active flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="dashboard" onclick="switchView('dashboard')"><i class="ph ph-house"></i> Resumen</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="radar" onclick="switchView('radar')"><i class="ph ph-radar"></i> Radar de vacantes</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="cv" onclick="switchView('cv')"><i class="ph ph-file-text"></i> CV y perfil profesional</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="seguimiento" onclick="switchView('seguimiento')"><i class="ph ph-columns"></i> Seguimiento</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="entrevista" onclick="switchView('entrevista')"><i class="ph ph-chats-circle"></i>
+        Entrevistas</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="networking" onclick="switchView('networking')"><i class="ph ph-users-three"></i> Red de
+        contactos</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="biblioteca" onclick="switchView('biblioteca')"><i class="ph ph-books"></i> Biblioteca
+        profesional</button>
+      <button
+        class="nav flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-semibold text-slate-300"
+        data-view="bitacora" onclick="switchView('bitacora')"><i class="ph ph-notebook"></i> Bitácora</button>
     </nav>
     <div class="mt-auto border-t border-slate-800 pt-4">
-      <div class="mb-3 flex items-center gap-2 text-xs text-slate-400"><span id="sidebar-status-dot" class="status-dot"></span><span id="sidebar-status">Comprobando Jetson</span></div>
-      <button onclick="saveNow()" class="btn-secondary mb-2 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold"><i class="ph ph-floppy-disk"></i> Guardar</button>
-      <button onclick="logout()" class="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-400 hover:bg-slate-900 hover:text-white"><i class="ph ph-sign-out"></i> Cerrar sesión</button>
+      <div class="mb-3 flex items-center gap-2 text-xs text-slate-400"><span id="sidebar-status-dot"
+          class="status-dot"></span><span id="sidebar-status">Comprobando Jetson</span></div>
+      <button onclick="saveNow()"
+        class="btn-secondary mb-2 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold"><i
+          class="ph ph-floppy-disk"></i> Guardar</button>
+      <button onclick="logout()"
+        class="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-slate-400 hover:bg-slate-900 hover:text-white"><i
+          class="ph ph-sign-out"></i> Cerrar sesión</button>
     </div>
   </aside>
 
@@ -103,12 +100,19 @@
     <header class="sticky top-0 z-30 border-b border-slate-800 bg-[#08111f]/95 px-4 py-3 backdrop-blur sm:px-6">
       <div class="mx-auto flex max-w-[1680px] items-center justify-between gap-3">
         <div class="flex min-w-0 items-center gap-3">
-          <button data-mobile-menu-open onclick="toggleMobileMenu(true)" class="btn-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-md lg:hidden" title="Abrir menú"><i class="ph ph-list text-xl"></i></button>
-          <div class="min-w-0"><p class="text-xs font-bold uppercase text-sky-300">Empleo</p><h2 id="view-title" class="truncate text-lg font-black text-white sm:text-xl">Resumen profesional</h2></div>
+          <button data-mobile-menu-open onclick="toggleMobileMenu(true)"
+            class="btn-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-md lg:hidden"
+            title="Abrir menú"><i class="ph ph-list text-xl"></i></button>
+          <div class="min-w-0">
+            <p class="text-xs font-bold uppercase text-sky-300">Empleo</p>
+            <h2 id="view-title" class="truncate text-lg font-black text-white sm:text-xl">Resumen profesional</h2>
+          </div>
         </div>
         <div class="flex shrink-0 items-center gap-2">
           <span id="api-status" class="hidden text-xs font-semibold text-slate-400 sm:inline">Conectando</span>
-          <button onclick="switchView('radar')" class="btn-primary flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold"><i class="ph ph-plus"></i><span class="hidden sm:inline">Nueva vacante</span></button>
+          <button onclick="switchView('radar')"
+            class="btn-primary flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold"><i
+              class="ph ph-plus"></i><span class="hidden sm:inline">Nueva vacante</span></button>
         </div>
       </div>
     </header>
@@ -116,23 +120,45 @@
     <main class="mx-auto max-w-[1680px] p-4 sm:p-6">
       <section id="view-dashboard" class="view space-y-5">
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div class="panel p-4"><p class="text-xs font-bold uppercase text-slate-500">Vacantes guardadas</p><p id="metric-vacancies" class="mt-2 text-3xl font-black text-white">0</p></div>
-          <div class="panel p-4"><p class="text-xs font-bold uppercase text-slate-500">Postulaciones</p><p id="metric-applied" class="mt-2 text-3xl font-black text-white">0</p></div>
-          <div class="panel p-4"><p class="text-xs font-bold uppercase text-slate-500">Entrevistas</p><p id="metric-interviews" class="mt-2 text-3xl font-black text-white">0</p></div>
-          <div class="panel p-4"><p class="text-xs font-bold uppercase text-slate-500">Fuentes verificadas</p><p id="metric-documents" class="mt-2 text-3xl font-black text-white">0</p></div>
+          <div class="panel p-4">
+            <p class="text-xs font-bold uppercase text-slate-500">Vacantes guardadas</p>
+            <p id="metric-vacancies" class="mt-2 text-3xl font-black text-white">0</p>
+          </div>
+          <div class="panel p-4">
+            <p class="text-xs font-bold uppercase text-slate-500">Postulaciones</p>
+            <p id="metric-applied" class="mt-2 text-3xl font-black text-white">0</p>
+          </div>
+          <div class="panel p-4">
+            <p class="text-xs font-bold uppercase text-slate-500">Entrevistas</p>
+            <p id="metric-interviews" class="mt-2 text-3xl font-black text-white">0</p>
+          </div>
+          <div class="panel p-4">
+            <p class="text-xs font-bold uppercase text-slate-500">Fuentes verificadas</p>
+            <p id="metric-documents" class="mt-2 text-3xl font-black text-white">0</p>
+          </div>
         </div>
         <div class="grid gap-5 xl:grid-cols-[1.15fr_.85fr]">
           <div class="panel p-5">
-            <div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="text-lg font-bold text-white">Prioridades actuales</h3><p class="mt-1 text-sm text-slate-400">Vacantes que requieren una acción concreta.</p></div><button onclick="switchView('seguimiento')" class="btn-secondary rounded-md px-3 py-2 text-sm font-semibold">Ver seguimiento</button></div>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="text-lg font-bold text-white">Prioridades actuales</h3>
+                <p class="mt-1 text-sm text-slate-400">Vacantes que requieren una acción concreta.</p>
+              </div><button onclick="switchView('seguimiento')"
+                class="btn-secondary rounded-md px-3 py-2 text-sm font-semibold">Ver seguimiento</button>
+            </div>
             <div id="priority-list" class="mt-4 grid gap-3"></div>
           </div>
           <div class="panel p-5">
             <h3 class="text-lg font-bold text-white">Foco de hoy</h3>
-            <textarea id="daily-focus" class="field mt-4 h-28 resize-none" placeholder="Ej. analizar 3 vacantes, adaptar un CV y contactar a una persona."></textarea>
+            <textarea id="daily-focus" class="field mt-4 h-28 resize-none"
+              placeholder="Ej. analizar 3 vacantes, adaptar un CV y contactar a una persona."></textarea>
             <div class="mt-4 space-y-2 text-sm text-slate-300">
-              <label class="flex items-center gap-2"><input id="task-search" type="checkbox" class="accent-teal-500"> Revisar vacantes relevantes</label>
-              <label class="flex items-center gap-2"><input id="task-cv" type="checkbox" class="accent-teal-500"> Aprobar un CV adaptado</label>
-              <label class="flex items-center gap-2"><input id="task-network" type="checkbox" class="accent-teal-500"> Hacer networking</label>
+              <label class="flex items-center gap-2"><input id="task-search" type="checkbox" class="accent-teal-500">
+                Revisar vacantes relevantes</label>
+              <label class="flex items-center gap-2"><input id="task-cv" type="checkbox" class="accent-teal-500">
+                Aprobar un CV adaptado</label>
+              <label class="flex items-center gap-2"><input id="task-network" type="checkbox" class="accent-teal-500">
+                Hacer networking</label>
             </div>
           </div>
         </div>
@@ -144,27 +170,65 @@
             <div class="panel p-5">
               <h3 class="text-lg font-bold text-white">Objetivo de búsqueda</h3>
               <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                <label><span class="label">Perfil</span><select id="radar-track" class="field" onchange="refreshKeywords()"><option value="general">General</option><option value="da">Data Analyst</option><option value="ds" selected>Data Scientist</option><option value="ml">Machine Learning</option></select></label>
-                <label><span class="label">Modalidad</span><select id="radar-modality" class="field"><option value="remoto_hibrido">Remoto o híbrido</option><option value="remoto">Remoto</option><option value="hibrido">Híbrido</option><option value="presencial">Presencial</option></select></label>
-                <label><span class="label">Ubicación</span><input id="radar-location" class="field" value="México / LATAM"></label>
-                <label><span class="label">Nivel</span><select id="radar-level" class="field"><option value="junior_mid">Junior / Mid</option><option value="junior">Junior</option><option value="mid">Mid</option><option value="freelance">Freelance</option></select></label>
-                <label class="sm:col-span-2"><span class="label">Idioma</span><select id="radar-language" class="field"><option value="auto">Detectar automáticamente</option><option value="es">Español</option><option value="en">Inglés</option></select></label>
+                <label><span class="label">Perfil</span><select id="radar-track" class="field"
+                    onchange="refreshKeywords()">
+                    <option value="general">General</option>
+                    <option value="da">Data Analyst</option>
+                    <option value="ds" selected>Data Scientist</option>
+                    <option value="ml">Machine Learning</option>
+                  </select></label>
+                <label><span class="label">Modalidad</span><select id="radar-modality" class="field">
+                    <option value="remoto_hibrido">Remoto o híbrido</option>
+                    <option value="remoto">Remoto</option>
+                    <option value="hibrido">Híbrido</option>
+                    <option value="presencial">Presencial</option>
+                  </select></label>
+                <label><span class="label">Ubicación</span><input id="radar-location" class="field"
+                    value="México / LATAM"></label>
+                <label><span class="label">Nivel</span><select id="radar-level" class="field">
+                    <option value="junior_mid">Junior / Mid</option>
+                    <option value="junior">Junior</option>
+                    <option value="mid">Mid</option>
+                    <option value="freelance">Freelance</option>
+                  </select></label>
+                <label class="sm:col-span-2"><span class="label">Idioma</span><select id="radar-language" class="field">
+                    <option value="auto">Detectar automáticamente</option>
+                    <option value="es">Español</option>
+                    <option value="en">Inglés</option>
+                  </select></label>
               </div>
             </div>
             <div class="panel p-5">
-              <div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold text-white">Palabras clave</h3><button onclick="copyKeywords()" class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Copiar consulta"><i class="ph ph-copy"></i></button></div>
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-lg font-bold text-white">Palabras clave</h3><button onclick="copyKeywords()"
+                  class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Copiar consulta"><i
+                    class="ph ph-copy"></i></button>
+              </div>
               <div id="keyword-chips" class="mt-4 flex flex-wrap gap-2"></div>
               <textarea id="boolean-query" class="field mt-4 h-24 resize-none font-mono text-xs" readonly></textarea>
               <div id="platform-links" class="mt-4 grid grid-cols-2 gap-2"></div>
             </div>
           </div>
           <div class="panel p-5">
-            <div class="flex flex-wrap items-start justify-between gap-3"><div><h3 class="text-lg font-bold text-white">Convertir vacante en ficha</h3><p class="mt-1 max-w-2xl text-sm text-slate-400">Pega el enlace y la descripción. El texto pegado tiene prioridad cuando el portal bloquea la lectura automática.</p></div><span class="badge border-teal-700 text-teal-200"><i class="ph ph-shield-check mr-1"></i> Sin scraping continuo</span></div>
-            <label class="mt-5 block"><span class="label">Enlace de la vacante</span><input id="vacancy-url" class="field" type="url" placeholder="https://www.linkedin.com/jobs/view/..."></label>
-            <label class="mt-4 block"><span class="label">Descripción completa</span><textarea id="vacancy-text" class="field h-80 resize-y" placeholder="Pega aquí puesto, empresa, responsabilidades y requisitos..."></textarea></label>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 class="text-lg font-bold text-white">Convertir vacante en ficha</h3>
+                <p class="mt-1 max-w-2xl text-sm text-slate-400">Pega el enlace y la descripción. El texto pegado tiene
+                  prioridad cuando el portal bloquea la lectura automática.</p>
+              </div><span class="badge border-teal-700 text-teal-200"><i class="ph ph-shield-check mr-1"></i> Sin
+                scraping continuo</span>
+            </div>
+            <label class="mt-5 block"><span class="label">Enlace de la vacante</span><input id="vacancy-url"
+                class="field" type="url" placeholder="https://www.linkedin.com/jobs/view/..."></label>
+            <label class="mt-4 block"><span class="label">Descripción completa</span><textarea id="vacancy-text"
+                class="field h-80 resize-y"
+                placeholder="Pega aquí puesto, empresa, responsabilidades y requisitos..."></textarea></label>
             <div class="mt-4 flex flex-wrap gap-2">
-              <button id="parse-vacancy-button" onclick="parseVacancy()" class="btn-primary flex items-center gap-2 rounded-md px-4 py-2.5 font-bold"><i class="ph ph-sparkle"></i> Generar ficha</button>
-              <button onclick="clearVacancyForm()" class="btn-secondary rounded-md px-4 py-2.5 font-semibold">Limpiar</button>
+              <button id="parse-vacancy-button" onclick="parseVacancy()"
+                class="btn-primary flex items-center gap-2 rounded-md px-4 py-2.5 font-bold"><i
+                  class="ph ph-sparkle"></i> Generar ficha</button>
+              <button onclick="clearVacancyForm()"
+                class="btn-secondary rounded-md px-4 py-2.5 font-semibold">Limpiar</button>
             </div>
             <div id="vacancy-result" class="mt-5 hidden"></div>
           </div>
@@ -177,29 +241,63 @@
             <div class="panel p-5">
               <h3 class="text-lg font-bold text-white">Generar documentos</h3>
               <p class="mt-1 text-sm text-slate-400">La IA solo puede usar datos de tu biblioteca activa.</p>
-              <label class="mt-4 block"><span class="label">Vacante</span><select id="cv-vacancy" class="field" onchange="selectCvVacancy(this.value)"></select></label>
+              <label class="mt-4 block"><span class="label">Vacante</span><select id="cv-vacancy" class="field"
+                  onchange="selectCvVacancy(this.value)"></select></label>
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
-                <label><span class="label">Perfil base</span><select id="cv-track" class="field"><option value="auto">Automático</option><option value="general">General</option><option value="da">Data Analyst</option><option value="ds">Data Scientist</option><option value="ml">Machine Learning</option></select></label>
-                <label><span class="label">Idioma</span><select id="cv-language" class="field"><option value="auto">Automático</option><option value="es">Español</option><option value="en">Inglés</option></select></label>
+                <label><span class="label">Perfil base</span><select id="cv-track" class="field">
+                    <option value="auto">Automático</option>
+                    <option value="general">General</option>
+                    <option value="da">Data Analyst</option>
+                    <option value="ds">Data Scientist</option>
+                    <option value="ml">Machine Learning</option>
+                  </select></label>
+                <label><span class="label">Idioma</span><select id="cv-language" class="field">
+                    <option value="auto">Automático</option>
+                    <option value="es">Español</option>
+                    <option value="en">Inglés</option>
+                  </select></label>
               </div>
-              <button id="generate-cv-button" onclick="generateCvDraft()" class="btn-primary mt-4 flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 font-bold"><i class="ph ph-file-plus"></i> Generar borrador</button>
+              <button id="generate-cv-button" onclick="generateCvDraft()"
+                class="btn-primary mt-4 flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 font-bold"><i
+                  class="ph ph-file-plus"></i> Generar borrador</button>
             </div>
             <div class="panel p-5">
-              <div class="flex items-center justify-between gap-3"><h3 class="text-lg font-bold text-white">Perfil profesional</h3><span id="profile-fact-count" class="badge text-slate-300">0 fuentes</span></div>
-              <label class="mt-4 block"><span class="label">Notas maestras confirmadas</span><textarea id="profile-notes" class="field h-40 resize-y" placeholder="Preferencias o hechos que deban considerarse siempre. No repitas el CV completo."></textarea></label>
-              <button onclick="saveProfile()" class="btn-secondary mt-3 rounded-md px-4 py-2 text-sm font-semibold"><i class="ph ph-floppy-disk mr-1"></i> Guardar perfil</button>
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-lg font-bold text-white">Perfil profesional</h3><span id="profile-fact-count"
+                  class="badge text-slate-300">0 fuentes</span>
+              </div>
+              <label class="mt-4 block"><span class="label">Notas maestras confirmadas</span><textarea
+                  id="profile-notes" class="field h-40 resize-y"
+                  placeholder="Preferencias o hechos que deban considerarse siempre. No repitas el CV completo."></textarea></label>
+              <button onclick="saveProfile()" class="btn-secondary mt-3 rounded-md px-4 py-2 text-sm font-semibold"><i
+                  class="ph ph-floppy-disk mr-1"></i> Guardar perfil</button>
             </div>
           </div>
           <div class="panel p-4 sm:p-5">
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700 pb-4">
-              <div><h3 class="text-lg font-bold text-white">Borrador para revisión</h3><p id="draft-status" class="mt-1 text-sm text-slate-400">Selecciona una vacante y genera un borrador.</p></div>
-              <div class="flex gap-2"><button onclick="setDraftTab('preview')" id="draft-tab-preview" class="btn-primary rounded-md px-3 py-2 text-sm font-bold">Vista Carta</button><button onclick="setDraftTab('json')" id="draft-tab-json" class="btn-secondary rounded-md px-3 py-2 text-sm font-semibold">Editar datos</button></div>
+              <div>
+                <h3 class="text-lg font-bold text-white">Borrador para revisión</h3>
+                <p id="draft-status" class="mt-1 text-sm text-slate-400">Selecciona una vacante y genera un borrador.
+                </p>
+              </div>
+              <div class="flex gap-2"><button onclick="setDraftTab('preview')" id="draft-tab-preview"
+                  class="btn-primary rounded-md px-3 py-2 text-sm font-bold">Vista Carta</button><button
+                  onclick="setDraftTab('json')" id="draft-tab-json"
+                  class="btn-secondary rounded-md px-3 py-2 text-sm font-semibold">Editar datos</button></div>
             </div>
-            <div id="draft-preview-wrap" class="mt-4 max-h-[900px] overflow-auto bg-slate-950 p-2 sm:p-4"><div id="draft-preview" class="cv-page"><p class="text-center text-slate-500">Aún no hay borrador.</p></div></div>
-            <textarea id="draft-json" class="field mt-4 hidden h-[700px] resize-y font-mono text-xs" spellcheck="false"></textarea>
+            <div id="draft-preview-wrap" class="mt-4 max-h-[900px] overflow-auto bg-slate-950 p-2 sm:p-4">
+              <div id="draft-preview" class="cv-page">
+                <p class="text-center text-slate-500">Aún no hay borrador.</p>
+              </div>
+            </div>
+            <textarea id="draft-json" class="field mt-4 hidden h-[700px] resize-y font-mono text-xs"
+              spellcheck="false"></textarea>
             <div id="draft-actions" class="mt-4 hidden flex-wrap gap-2">
-              <button onclick="saveDraft()" class="btn-secondary rounded-md px-4 py-2 text-sm font-semibold"><i class="ph ph-floppy-disk mr-1"></i> Guardar cambios</button>
-              <button id="approve-draft-button" onclick="approveDraft()" class="btn-primary rounded-md px-4 py-2 text-sm font-bold"><i class="ph ph-check-circle mr-1"></i> Aprobar y crear archivos</button>
+              <button onclick="saveDraft()" class="btn-secondary rounded-md px-4 py-2 text-sm font-semibold"><i
+                  class="ph ph-floppy-disk mr-1"></i> Guardar cambios</button>
+              <button id="approve-draft-button" onclick="approveDraft()"
+                class="btn-primary rounded-md px-4 py-2 text-sm font-bold"><i class="ph ph-check-circle mr-1"></i>
+                Aprobar y crear archivos</button>
             </div>
             <div id="artifact-links" class="mt-4 hidden grid gap-2 sm:grid-cols-2"></div>
           </div>
@@ -207,187 +305,152 @@
       </section>
 
       <section id="view-seguimiento" class="view hidden space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="text-xl font-black text-white">Seguimiento de postulaciones</h3><p class="mt-1 text-sm text-slate-400">De la vacante guardada al resultado final.</p></div><button onclick="switchView('radar')" class="btn-primary rounded-md px-4 py-2 text-sm font-bold"><i class="ph ph-plus mr-1"></i> Agregar vacante</button></div>
-        <div class="overflow-x-auto pb-4"><div id="tracking-board" class="kanban-grid"></div></div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-black text-white">Seguimiento de postulaciones</h3>
+            <p class="mt-1 text-sm text-slate-400">De la vacante guardada al resultado final.</p>
+          </div><button onclick="switchView('radar')" class="btn-primary rounded-md px-4 py-2 text-sm font-bold"><i
+              class="ph ph-plus mr-1"></i> Agregar vacante</button>
+        </div>
+        <div class="overflow-x-auto pb-4">
+          <div id="tracking-board" class="kanban-grid"></div>
+        </div>
       </section>
 
       <section id="view-entrevista" class="view hidden grid gap-5 xl:grid-cols-2">
-        <div class="panel p-5"><h3 class="text-lg font-bold text-white">Simulador de entrevista</h3><label class="mt-4 block"><span class="label">Puesto objetivo</span><input id="interview-role" class="field" value="Data Scientist"></label><button id="question-button" onclick="generateQuestion()" class="btn-primary mt-3 rounded-md px-4 py-2 font-bold">Generar pregunta</button><div id="question-box" class="panel-muted mt-4 min-h-24 p-4 text-sm text-sky-100">La pregunta aparecerá aquí.</div><textarea id="answer-box" class="field mt-4 h-44 resize-y" placeholder="Escribe tu respuesta..."></textarea><button id="evaluate-button" onclick="evaluateAnswer()" class="btn-secondary mt-3 rounded-md px-4 py-2 font-semibold">Evaluar respuesta</button></div>
-        <div class="panel p-5"><h3 class="text-lg font-bold text-white">Retroalimentación</h3><div id="feedback-box" class="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-300">Esperando respuesta.</div></div>
+        <div class="panel p-5">
+          <h3 class="text-lg font-bold text-white">Simulador de entrevista</h3><label class="mt-4 block"><span
+              class="label">Puesto objetivo</span><input id="interview-role" class="field"
+              value="Data Scientist"></label><button id="question-button" onclick="generateQuestion()"
+            class="btn-primary mt-3 rounded-md px-4 py-2 font-bold">Generar pregunta</button>
+          <div id="question-box" class="panel-muted mt-4 min-h-24 p-4 text-sm text-sky-100">La pregunta aparecerá aquí.
+          </div><textarea id="answer-box" class="field mt-4 h-44 resize-y"
+            placeholder="Escribe tu respuesta..."></textarea><button id="evaluate-button" onclick="evaluateAnswer()"
+            class="btn-secondary mt-3 rounded-md px-4 py-2 font-semibold">Evaluar respuesta</button>
+        </div>
+        <div class="panel p-5">
+          <h3 class="text-lg font-bold text-white">Retroalimentación</h3>
+          <div id="feedback-box" class="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-300">Esperando respuesta.
+          </div>
+        </div>
       </section>
 
       <section id="view-networking" class="view hidden grid gap-5 xl:grid-cols-2">
-        <div class="panel p-5"><h3 class="text-lg font-bold text-white">Mensaje para tu red</h3><label class="mt-4 block"><span class="label">Tipo</span><select id="network-template" class="field" onchange="loadNetworkTemplate()"><option value="recruiter">Reclutador técnico</option><option value="connection">Nueva conexión</option><option value="referral">Solicitar orientación</option><option value="followup">Seguimiento de postulación</option></select></label><label class="mt-3 block"><span class="label">Contexto</span><textarea id="network-context" class="field h-32 resize-y" placeholder="Persona, empresa, puesto e interés común..."></textarea></label><button id="network-button" onclick="adaptNetworkMessage()" class="btn-primary mt-3 rounded-md px-4 py-2 font-bold">Adaptar con IA</button></div>
-        <div class="panel p-5"><textarea id="network-output" class="field h-80 resize-y"></textarea><button onclick="copyFrom('network-output')" class="btn-secondary mt-3 rounded-md px-4 py-2 text-sm font-semibold"><i class="ph ph-copy mr-1"></i> Copiar mensaje</button></div>
+        <div class="panel p-5">
+          <h3 class="text-lg font-bold text-white">Mensaje para tu red</h3><label class="mt-4 block"><span
+              class="label">Tipo</span><select id="network-template" class="field" onchange="loadNetworkTemplate()">
+              <option value="recruiter">Reclutador técnico</option>
+              <option value="connection">Nueva conexión</option>
+              <option value="referral">Solicitar orientación</option>
+              <option value="followup">Seguimiento de postulación</option>
+            </select></label><label class="mt-3 block"><span class="label">Contexto</span><textarea id="network-context"
+              class="field h-32 resize-y"
+              placeholder="Persona, empresa, puesto e interés común..."></textarea></label><button id="network-button"
+            onclick="adaptNetworkMessage()" class="btn-primary mt-3 rounded-md px-4 py-2 font-bold">Adaptar con
+            IA</button>
+        </div>
+        <div class="panel p-5"><textarea id="network-output" class="field h-80 resize-y"></textarea><button
+            onclick="copyFrom('network-output')"
+            class="btn-secondary mt-3 rounded-md px-4 py-2 text-sm font-semibold"><i class="ph ph-copy mr-1"></i> Copiar
+            mensaje</button></div>
       </section>
 
       <section id="view-biblioteca" class="view hidden space-y-5">
         <div class="grid gap-5 xl:grid-cols-[.65fr_1.35fr]">
-          <div class="panel p-5"><h3 class="text-lg font-bold text-white">Agregar documento privado</h3><p class="mt-1 text-sm text-slate-400">DOCX, PDF, PNG o JPG. Máximo 10 MB.</p><input id="document-file" type="file" accept=".docx,.pdf,.png,.jpg,.jpeg" class="field mt-5 p-2"><label class="mt-3 block"><span class="label">Clasificación</span><select id="document-category" class="field"><option value="auto">Detectar automáticamente</option><option value="cv_general">CV general</option><option value="cv_data_analyst">CV Data Analyst</option><option value="cv_data_scientist">CV Data Scientist</option><option value="cv_machine_learning">CV Machine Learning</option><option value="plan_busqueda">Plan de búsqueda</option><option value="networking">Networking</option><option value="linkedin">LinkedIn</option><option value="referencia">Otra referencia</option></select></label><button id="upload-button" onclick="uploadDocument()" class="btn-primary mt-4 flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 font-bold"><i class="ph ph-upload-simple"></i> Subir y procesar</button><p class="mt-3 text-xs text-slate-500">Los originales se guardan fuera de GitHub Pages. Los duplicados se detectan por SHA-256.</p></div>
-          <div class="panel p-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="text-lg font-bold text-white">Fuentes profesionales</h3><p class="mt-1 text-sm text-slate-400">Solo documentos activos participan en la generación.</p></div><button onclick="loadDocuments()" class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Actualizar"><i class="ph ph-arrows-clockwise"></i></button></div><div id="document-list" class="mt-4 space-y-2"></div></div>
+          <div class="panel p-5">
+            <h3 class="text-lg font-bold text-white">Agregar documento privado</h3>
+            <p class="mt-1 text-sm text-slate-400">DOCX, PDF, PNG o JPG. Máximo 10 MB.</p><input id="document-file"
+              type="file" accept=".docx,.pdf,.png,.jpg,.jpeg" class="field mt-5 p-2"><label class="mt-3 block"><span
+                class="label">Clasificación</span><select id="document-category" class="field">
+                <option value="auto">Detectar automáticamente</option>
+                <option value="cv_general">CV general</option>
+                <option value="cv_data_analyst">CV Data Analyst</option>
+                <option value="cv_data_scientist">CV Data Scientist</option>
+                <option value="cv_machine_learning">CV Machine Learning</option>
+                <option value="plan_busqueda">Plan de búsqueda</option>
+                <option value="networking">Networking</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="referencia">Otra referencia</option>
+              </select></label><button id="upload-button" onclick="uploadDocument()"
+              class="btn-primary mt-4 flex w-full items-center justify-center gap-2 rounded-md px-4 py-3 font-bold"><i
+                class="ph ph-upload-simple"></i> Subir y procesar</button>
+            <p class="mt-3 text-xs text-slate-500">Los originales se guardan fuera de GitHub Pages. Los duplicados se
+              detectan por SHA-256.</p>
+          </div>
+          <div class="panel p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="text-lg font-bold text-white">Fuentes profesionales</h3>
+                <p class="mt-1 text-sm text-slate-400">Solo documentos activos participan en la generación.</p>
+              </div><button onclick="loadDocuments()"
+                class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Actualizar"><i
+                  class="ph ph-arrows-clockwise"></i></button>
+            </div>
+            <div id="document-list" class="mt-4 space-y-2"></div>
+          </div>
         </div>
       </section>
 
       <section id="view-bitacora" class="view hidden grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
-        <div class="panel p-5"><h3 class="text-lg font-bold text-white">Bitácora de búsqueda</h3><textarea id="daily-log" class="field mt-4 h-72 resize-y" placeholder="Qué busqué, dónde apliqué, qué aprendí y qué sigue..."></textarea><div class="mt-3 flex flex-wrap gap-2"><button onclick="saveLog()" class="btn-primary rounded-md px-4 py-2 font-bold">Guardar entrada</button><button onclick="coachLog()" class="btn-secondary rounded-md px-4 py-2 font-semibold">Analizar con IA</button></div></div>
-        <div class="panel p-5"><h3 class="text-lg font-bold text-white">Historial y orientación</h3><div id="coach-output" class="panel-muted mt-4 hidden whitespace-pre-wrap p-4 text-sm leading-6 text-slate-300"></div><div id="log-history" class="mt-4 space-y-3"></div></div>
+        <div class="panel p-5">
+          <h3 class="text-lg font-bold text-white">Bitácora de búsqueda</h3><textarea id="daily-log"
+            class="field mt-4 h-72 resize-y"
+            placeholder="Qué busqué, dónde apliqué, qué aprendí y qué sigue..."></textarea>
+          <div class="mt-3 flex flex-wrap gap-2"><button onclick="saveLog()"
+              class="btn-primary rounded-md px-4 py-2 font-bold">Guardar entrada</button><button onclick="coachLog()"
+              class="btn-secondary rounded-md px-4 py-2 font-semibold">Analizar con IA</button></div>
+        </div>
+        <div class="panel p-5">
+          <h3 class="text-lg font-bold text-white">Historial y orientación</h3>
+          <div id="coach-output"
+            class="panel-muted mt-4 hidden whitespace-pre-wrap p-4 text-sm leading-6 text-slate-300"></div>
+          <div id="log-history" class="mt-4 space-y-3"></div>
+        </div>
       </section>
     </main>
   </div>
 
-  <div id="job-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/70 p-3 sm:p-6" onclick="if(event.target===this)closeJobModal()">
+  <div id="job-modal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/70 p-3 sm:p-6"
+    onclick="if(event.target===this)closeJobModal()">
     <div class="panel max-h-[92vh] w-full max-w-3xl overflow-y-auto p-5 sm:p-6">
-      <div class="flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase text-sky-300">Ficha de vacante</p><h3 id="modal-job-title" class="mt-1 text-xl font-black text-white">Vacante</h3></div><button onclick="closeJobModal()" class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Cerrar"><i class="ph ph-x"></i></button></div>
-      <div class="mt-5 grid gap-3 sm:grid-cols-2"><label><span class="label">Puesto</span><input id="modal-title" class="field"></label><label><span class="label">Empresa</span><input id="modal-company" class="field"></label><label><span class="label">Ubicación</span><input id="modal-location" class="field"></label><label><span class="label">Modalidad</span><input id="modal-modality" class="field"></label><label><span class="label">Salario publicado</span><input id="modal-salary" class="field"></label><label><span class="label">Contacto</span><input id="modal-contact" class="field"></label></div>
-      <label class="mt-3 block"><span class="label">Resumen</span><textarea id="modal-summary" class="field h-28 resize-y"></textarea></label>
-      <label class="mt-3 block"><span class="label">Notas de seguimiento</span><textarea id="modal-notes" class="field h-24 resize-y"></textarea></label>
-      <label class="mt-3 block"><span class="label">Etapa</span><select id="modal-status" class="field"></select></label>
-      <div class="mt-5 flex flex-wrap gap-2"><button onclick="saveJobModal()" class="btn-primary rounded-md px-4 py-2 font-bold">Guardar cambios</button><button onclick="prepareCvFromModal()" class="btn-secondary rounded-md px-4 py-2 font-semibold"><i class="ph ph-file-text mr-1"></i> Preparar CV</button><button onclick="openJobLink()" class="btn-secondary rounded-md px-4 py-2 font-semibold"><i class="ph ph-arrow-square-out mr-1"></i> Abrir vacante</button></div>
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-xs font-bold uppercase text-sky-300">Ficha de vacante</p>
+          <h3 id="modal-job-title" class="mt-1 text-xl font-black text-white">Vacante</h3>
+        </div><button onclick="closeJobModal()"
+          class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Cerrar"><i
+            class="ph ph-x"></i></button>
+      </div>
+      <div class="mt-5 grid gap-3 sm:grid-cols-2"><label><span class="label">Puesto</span><input id="modal-title"
+            class="field"></label><label><span class="label">Empresa</span><input id="modal-company"
+            class="field"></label><label><span class="label">Ubicación</span><input id="modal-location"
+            class="field"></label><label><span class="label">Modalidad</span><input id="modal-modality"
+            class="field"></label><label><span class="label">Salario publicado</span><input id="modal-salary"
+            class="field"></label><label><span class="label">Contacto</span><input id="modal-contact"
+            class="field"></label></div>
+      <label class="mt-3 block"><span class="label">Resumen</span><textarea id="modal-summary"
+          class="field h-28 resize-y"></textarea></label>
+      <label class="mt-3 block"><span class="label">Notas de seguimiento</span><textarea id="modal-notes"
+          class="field h-24 resize-y"></textarea></label>
+      <label class="mt-3 block"><span class="label">Etapa</span><select id="modal-status"
+          class="field"></select></label>
+      <div class="mt-5 flex flex-wrap gap-2"><button onclick="saveJobModal()"
+          class="btn-primary rounded-md px-4 py-2 font-bold">Guardar cambios</button><button
+          onclick="prepareCvFromModal()" class="btn-secondary rounded-md px-4 py-2 font-semibold"><i
+            class="ph ph-file-text mr-1"></i> Preparar CV</button><button onclick="openJobLink()"
+          class="btn-secondary rounded-md px-4 py-2 font-semibold"><i class="ph ph-arrow-square-out mr-1"></i> Abrir
+          vacante</button></div>
     </div>
   </div>
 
-  <div id="toast" class="pointer-events-none fixed bottom-5 left-1/2 z-[120] -translate-x-1/2 translate-y-3 opacity-0 transition-all"><div id="toast-text" class="rounded-md border border-slate-600 bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-2xl"></div></div>
+  <div id="toast"
+    class="pointer-events-none fixed bottom-5 left-1/2 z-[120] -translate-x-1/2 translate-y-3 opacity-0 transition-all">
+    <div id="toast-text"
+      class="rounded-md border border-slate-600 bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-2xl">
+    </div>
+  </div>
 
-  <script>
-    const API_BASE = window.JETSON_API_BASE || "";
-    const APP_ID = "empleo";
-    const SESSION_TOKEN_KEY = "agent_hub_session_token";
-    const DATA_KEY = "job_agent_state_v2";
-    const LEGACY_DATA_KEY = "job_agent_state_v1";
-    const STATUS_ORDER = ["guardada","prioritaria","cv_preparacion","postulada","entrevista","resultado"];
-    const STATUS_LABELS = { guardada:"Guardada", prioritaria:"Prioritaria", cv_preparacion:"CV en preparación", postulada:"Postulada", entrevista:"Entrevista", resultado:"Resultado" };
-    const VIEW_TITLES = { dashboard:"Resumen profesional", radar:"Radar de vacantes", cv:"CV y perfil profesional", seguimiento:"Seguimiento de postulaciones", entrevista:"Preparación de entrevistas", networking:"Red de contactos", biblioteca:"Biblioteca profesional", bitacora:"Bitácora de búsqueda" };
-    const TRACKS = {
-      general:{ roles:["Data Scientist","Data Analyst","Machine Learning Engineer","Python Developer"], keywords:["Python","SQL","Machine Learning","Data Analytics","Pandas","Scikit-learn","Remoto"] },
-      da:{ roles:["Data Analyst","Business Intelligence Analyst","BI Analyst","Analista de Datos"], keywords:["SQL","Python","Excel","Power BI","Dashboards","KPIs","Data Storytelling","ETL"] },
-      ds:{ roles:["Data Scientist","Junior Data Scientist","Applied Scientist","Científico de Datos"], keywords:["Python","SQL","Machine Learning","EDA","Feature Engineering","Modelado Predictivo","Scikit-learn","A/B Testing"] },
-      ml:{ roles:["Machine Learning Engineer","ML Engineer","AI Engineer","Ingeniero de Machine Learning"], keywords:["Python","TensorFlow","PyTorch","Scikit-learn","MLOps","Pipelines","Computer Vision","NLP"] }
-    };
-    const NETWORK_TEMPLATES = {
-      recruiter:"Hola [Nombre], vi la vacante de [Puesto] en [Empresa]. Mi perfil combina Python, SQL y proyectos de datos con resultados medibles. ¿El proceso continúa abierto? Me gustaría conocer el siguiente paso.",
-      connection:"Hola [Nombre], vi tu experiencia en [Área/Empresa] y me pareció muy interesante [detalle]. Actualmente estoy creciendo en Data/ML y me gustaría mantenernos en contacto.",
-      referral:"Hola [Nombre], estoy explorando oportunidades de [Puesto] en [Empresa]. No quiero ponerte en una situación incómoda; si tienes unos minutos, agradecería cualquier orientación sobre el equipo o el proceso.",
-      followup:"Hola [Nombre], espero que estés bien. Quería dar seguimiento a mi postulación para [Puesto]. Continúo muy interesado porque mi experiencia en [fortaleza] se relaciona con [necesidad]. Quedo atento, gracias."
-    };
-    const defaultState = { vacantes:[], bitacoras:[], dailyFocus:"", tasks:{}, ultimoMensaje:"", latestGeneration:null };
-    let state = structuredClone(defaultState);
-    let saveTimer = null;
-    let profileData = { profile:{}, facts:[], document_count:0 };
-    let documents = [];
-    let activeJobId = null;
-
-    function sessionToken(){ return localStorage.getItem(SESSION_TOKEN_KEY) || ""; }
-    async function apiFetch(path, options={}) {
-      const headers = { ...(options.headers || {}) };
-      if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
-      if (sessionToken()) headers["X-Session-Token"] = sessionToken();
-      let response;
-      try { response = await fetch(`${API_BASE}${path}`, { credentials:"include", ...options, headers }); }
-      catch (error) { error.isNetworkError = true; throw error; }
-      if (response.status === 401) { localStorage.removeItem(SESSION_TOKEN_KEY); showLogin(); throw Object.assign(new Error("Sesión vencida"), { status:401 }); }
-      if (!response.ok) { let detail = `Error ${response.status}`; try { const data=await response.json(); detail=data.detail || detail; } catch(_){} throw Object.assign(new Error(detail), { status:response.status }); }
-      const type = response.headers.get("content-type") || "";
-      return type.includes("application/json") ? response.json() : response;
-    }
-    function errorMessage(error){ if(error?.isNetworkError) return "No se pudo conectar con la API de la Jetson."; return error?.message || "Ocurrió un error inesperado."; }
-
-    async function handleLogin(event){
-      event.preventDefault(); const button=document.getElementById("login-button"), error=document.getElementById("login-error");
-      button.disabled=true; button.innerHTML='<i class="ph ph-circle-notch animate-spin"></i> Entrando'; error.classList.add("hidden");
-      try { const data=await apiFetch("/api/auth/login", { method:"POST", body:JSON.stringify({ username:document.getElementById("username").value, password:document.getElementById("password").value }) }); localStorage.setItem(SESSION_TOKEN_KEY,data.session_token); hideLogin(); await initApp(); }
-      catch(e){ error.textContent=errorMessage(e); error.classList.remove("hidden"); }
-      finally { button.disabled=false; button.innerHTML='<i class="ph-bold ph-sign-in"></i> Entrar'; }
-    }
-    async function checkLogin(){ try { const data=await apiFetch("/api/auth/status"); if(data.authenticated){ hideLogin(); await initApp(); } else showLogin(); } catch(_){ showLogin(); } }
-    function showLogin(){ document.getElementById("login-overlay").classList.remove("hidden"); }
-    function hideLogin(){ document.getElementById("login-overlay").classList.add("hidden"); }
-    async function logout(){ try{ await apiFetch("/api/auth/logout",{method:"POST"}); }catch(_){} localStorage.removeItem(SESSION_TOKEN_KEY); showLogin(); }
-
-    async function initApp(){
-      const local = localStorage.getItem(DATA_KEY) || localStorage.getItem(LEGACY_DATA_KEY);
-      if(local){ try{ state={...structuredClone(defaultState),...JSON.parse(local)}; }catch(_){} }
-      try { const remote=await apiFetch(`/api/state/${APP_ID}`); if(remote.state) state={...structuredClone(defaultState),...remote.state}; setApiStatus(true); }
-      catch(_){ setApiStatus(false); }
-      state.vacantes=(state.vacantes||[]).map(normalizeJob);
-      hydrateState();
-      await Promise.allSettled([loadProfile(),loadDocuments(),loadServerVacancies()]);
-      refreshKeywords(); renderAll();
-    }
-    function normalizeJob(job){ const aliases={por_revisar:"guardada",cerrada:"resultado"}; return { ...job, id:job.id||crypto.randomUUID(), title:job.title||"Vacante por revisar", company:job.company||"Por identificar", status:aliases[job.status]||job.status||"guardada", source_url:job.source_url||job.link||"", match_score:Number(job.match_score??job.matchScore??0), created_at:job.created_at||job.createdAt||Date.now() }; }
-    function setApiStatus(online){ document.getElementById("api-status").textContent=online?"Jetson conectada":"Modo local"; document.getElementById("sidebar-status").textContent=online?"Jetson conectada":"API no disponible"; document.getElementById("sidebar-status-dot").classList.toggle("online",online); }
-    function hydrateState(){ document.getElementById("daily-focus").value=state.dailyFocus||""; document.getElementById("task-search").checked=!!state.tasks.search; document.getElementById("task-cv").checked=!!state.tasks.cv; document.getElementById("task-network").checked=!!state.tasks.network; document.getElementById("network-output").value=state.ultimoMensaje||NETWORK_TEMPLATES.recruiter; ["daily-focus","task-search","task-cv","task-network"].forEach(id=>document.getElementById(id).addEventListener("change",captureDailyState)); }
-    function captureDailyState(){ state.dailyFocus=document.getElementById("daily-focus").value; state.tasks={search:document.getElementById("task-search").checked,cv:document.getElementById("task-cv").checked,network:document.getElementById("task-network").checked}; triggerSave(); }
-    function triggerSave(){ clearTimeout(saveTimer); localStorage.setItem(DATA_KEY,JSON.stringify(state)); saveTimer=setTimeout(saveNow,900); }
-    async function saveNow(){ localStorage.setItem(DATA_KEY,JSON.stringify(state)); try{ await apiFetch(`/api/state/${APP_ID}`,{method:"PUT",body:JSON.stringify({state})}); toast("Guardado en la Jetson"); setApiStatus(true); }catch(_){ toast("Guardado localmente"); setApiStatus(false); } }
-
-    function toggleMobileMenu(open){ const sidebar=document.getElementById("mobile-sidebar"), overlay=document.getElementById("mobile-menu-overlay"); if(!open&&window.innerWidth>=1024){sidebar.style.transform="";sidebar.style.translate="";overlay.classList.add("hidden");return;} sidebar.classList.toggle("-translate-x-full",!open); sidebar.style.transform=open?"translateX(0)":"translateX(-100%)";sidebar.style.translate=open?"0":"-100%";overlay.classList.toggle("hidden",!open); }
-    function switchView(view){ document.querySelectorAll(".view").forEach(node=>node.classList.toggle("hidden",node.id!==`view-${view}`)); document.querySelectorAll(".nav").forEach(node=>node.classList.toggle("active",node.dataset.view===view)); document.getElementById("view-title").textContent=VIEW_TITLES[view]||"Empleo"; toggleMobileMenu(false); if(view==="biblioteca")loadDocuments(); if(view==="cv")renderCvVacancyOptions(); if(view==="seguimiento")renderTracking(); window.scrollTo({top:0,behavior:"smooth"}); }
-
-    async function loadProfile(){ try{ profileData=await apiFetch("/api/empleo/profile"); document.getElementById("profile-notes").value=profileData.profile?.notes||""; }catch(e){ if(e.status!==404)console.warn(e); } renderProfileMetrics(); }
-    function renderProfileMetrics(){ const count=profileData.document_count||documents.filter(d=>d.status==="active").length; document.getElementById("metric-documents").textContent=count; document.getElementById("profile-fact-count").textContent=`${profileData.facts?.length||0} hechos`; }
-    async function saveProfile(){ try{ await apiFetch("/api/empleo/profile",{method:"PUT",body:JSON.stringify({profile:{...profileData.profile,notes:document.getElementById("profile-notes").value}})}); toast("Perfil actualizado"); await loadProfile(); }catch(e){toast(errorMessage(e));} }
-
-    async function loadServerVacancies(){ try{ const data=await apiFetch("/api/empleo/vacancies"); const map=new Map(state.vacantes.map(job=>[job.id,job])); (data.vacancies||[]).forEach(job=>map.set(job.id,normalizeJob({...map.get(job.id),...job}))); state.vacantes=[...map.values()]; triggerSave(); }catch(e){ if(e.status!==404)console.warn(e); } renderAll(); }
-    function renderAll(){ renderMetrics(); renderPriorities(); renderTracking(); renderCvVacancyOptions(); renderLogs(); }
-    function renderMetrics(){ const jobs=state.vacantes||[]; document.getElementById("metric-vacancies").textContent=jobs.length; document.getElementById("metric-applied").textContent=jobs.filter(j=>["postulada","entrevista","resultado"].includes(j.status)).length; document.getElementById("metric-interviews").textContent=jobs.filter(j=>j.status==="entrevista").length; renderProfileMetrics(); }
-    function renderPriorities(){ const root=document.getElementById("priority-list"), jobs=state.vacantes.filter(j=>["prioritaria","cv_preparacion","entrevista"].includes(j.status)).slice(0,5); root.innerHTML=jobs.length?jobs.map(j=>`<button onclick="openJobModal('${j.id}')" class="panel-muted flex w-full items-center justify-between gap-3 p-3 text-left"><span class="min-w-0"><strong class="block truncate text-sm text-white">${esc(j.title)}</strong><span class="block truncate text-xs text-slate-400">${esc(j.company)} · ${STATUS_LABELS[j.status]}</span></span><span class="badge text-sky-200">${j.match_score||0}%</span></button>`).join(""):'<div class="panel-muted p-6 text-center text-sm text-slate-500">No hay prioridades. Agrega una vacante desde el Radar.</div>'; }
-
-    function refreshKeywords(){ const track=TRACKS[document.getElementById("radar-track").value]||TRACKS.general, location=document.getElementById("radar-location").value||"Mexico"; document.getElementById("keyword-chips").innerHTML=track.keywords.map(k=>`<span class="badge border-sky-800 bg-sky-950/40 text-sky-200">${esc(k)}</span>`).join(""); const query=`(${track.roles.map(r=>`"${r}"`).join(" OR ")}) AND (${track.keywords.slice(0,5).join(" OR ")})`; document.getElementById("boolean-query").value=query; const q=encodeURIComponent(track.roles[0]), loc=encodeURIComponent(location); const links=[ ["LinkedIn",`https://www.linkedin.com/jobs/search/?keywords=${q}&location=${loc}`],["OCC",`https://www.occ.com.mx/empleos/?q=${q}`],["Remote Rocketship",`https://www.remoterocketship.com/?search=${q}`],["Wellfound","https://wellfound.com/jobs"],["DailyRemote",`https://dailyremote.com/remote-${track.roles[0].toLowerCase().replaceAll(" ","-")}-jobs`],["Upwork",`https://www.upwork.com/nx/search/jobs/?q=${q}`] ]; document.getElementById("platform-links").innerHTML=links.map(([name,url])=>`<a href="${url}" target="_blank" rel="noopener noreferrer" class="btn-secondary flex items-center justify-between rounded-md px-3 py-2 text-xs font-semibold">${name}<i class="ph ph-arrow-square-out"></i></a>`).join(""); }
-    function copyKeywords(){ navigator.clipboard.writeText(document.getElementById("boolean-query").value); toast("Consulta copiada"); }
-    function clearVacancyForm(){ document.getElementById("vacancy-url").value=""; document.getElementById("vacancy-text").value=""; document.getElementById("vacancy-result").classList.add("hidden"); }
-    async function parseVacancy(){ const url=document.getElementById("vacancy-url").value.trim(), text=document.getElementById("vacancy-text").value.trim(); if(!url&&!text)return toast("Agrega un enlace o pega la vacante"); const button=document.getElementById("parse-vacancy-button"); setLoading(button,true,"Analizando vacante"); try{ const data=await apiFetch("/api/empleo/vacancies/parse",{method:"POST",body:JSON.stringify({url,text,profile_track:document.getElementById("radar-track").value,modality:document.getElementById("radar-modality").value,location:document.getElementById("radar-location").value,language:document.getElementById("radar-language").value,level:document.getElementById("radar-level").value})}); const job=normalizeJob(data.vacancy); state.vacantes.unshift(job); triggerSave(); renderAll(); renderVacancyResult(job,data.fetch_warning); toast("Ficha creada"); }catch(e){toast(errorMessage(e));}finally{setLoading(button,false,'<i class="ph ph-sparkle"></i> Generar ficha');} }
-    function renderVacancyResult(job,warning){ const root=document.getElementById("vacancy-result"); root.classList.remove("hidden"); root.innerHTML=`<div class="panel-muted p-4"><div class="flex flex-wrap items-start justify-between gap-3"><div><h4 class="font-bold text-white">${esc(job.title)}</h4><p class="text-sm text-slate-400">${esc(job.company)} · ${esc(job.location||"Ubicación no indicada")}</p></div><span class="badge border-teal-700 text-teal-200">${job.match_score||0}% coincidencia</span></div><p class="mt-3 text-sm text-slate-300">${esc(job.summary||"Ficha creada.")}</p>${warning?`<p class="mt-3 text-xs text-amber-300">${esc(warning)} Se usó el texto pegado.</p>`:""}<div class="mt-4 flex gap-2"><button onclick="openJobModal('${job.id}')" class="btn-secondary rounded-md px-3 py-2 text-sm font-semibold">Revisar ficha</button><button onclick="prepareCv('${job.id}')" class="btn-primary rounded-md px-3 py-2 text-sm font-bold">Preparar CV</button></div></div>`; }
-
-    function renderTracking(){ const root=document.getElementById("tracking-board"); if(!root)return; root.innerHTML=STATUS_ORDER.map(status=>{const jobs=state.vacantes.filter(j=>j.status===status);return `<section class="panel-muted min-h-[420px] p-3"><div class="mb-3 flex items-center justify-between"><h3 class="text-sm font-bold text-white">${STATUS_LABELS[status]}</h3><span class="badge text-slate-400">${jobs.length}</span></div><div class="space-y-2">${jobs.map(jobCard).join("")||'<p class="py-8 text-center text-xs text-slate-600">Sin vacantes</p>'}</div></section>`;}).join(""); }
-    function jobCard(job){ return `<article class="panel p-3"><button onclick="openJobModal('${job.id}')" class="w-full text-left"><div class="flex items-start justify-between gap-2"><strong class="text-sm text-white">${esc(job.title)}</strong><span class="text-xs font-bold text-sky-300">${job.match_score||0}%</span></div><p class="mt-1 text-xs text-slate-400">${esc(job.company)}</p><p class="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">${esc(job.next_action||job.nextAction||"Revisar ficha")}</p></button><select aria-label="Cambiar etapa" onchange="moveJob('${job.id}',this.value)" class="field mt-3 p-2 text-xs">${STATUS_ORDER.map(s=>`<option value="${s}" ${s===job.status?"selected":""}>${STATUS_LABELS[s]}</option>`).join("")}</select></article>`; }
-    async function moveJob(id,status){ const job=state.vacantes.find(j=>j.id===id); if(!job)return; job.status=status; renderAll();triggerSave();try{await apiFetch(`/api/empleo/vacancies/${id}`,{method:"PATCH",body:JSON.stringify({fields:{status}})});}catch(e){if(e.status!==404)toast(errorMessage(e));} }
-    function openJobModal(id){ const job=state.vacantes.find(j=>j.id===id);if(!job)return;activeJobId=id;document.getElementById("modal-job-title").textContent=job.title;document.getElementById("modal-title").value=job.title||"";document.getElementById("modal-company").value=job.company||"";document.getElementById("modal-location").value=job.location||"";document.getElementById("modal-modality").value=job.modality||"";document.getElementById("modal-salary").value=job.salary||"";document.getElementById("modal-contact").value=job.contact||"";document.getElementById("modal-summary").value=job.summary||"";document.getElementById("modal-notes").value=job.notes||"";document.getElementById("modal-status").innerHTML=STATUS_ORDER.map(s=>`<option value="${s}" ${s===job.status?"selected":""}>${STATUS_LABELS[s]}</option>`).join("");document.getElementById("job-modal").classList.remove("hidden");document.getElementById("job-modal").classList.add("flex"); }
-    function closeJobModal(){document.getElementById("job-modal").classList.add("hidden");document.getElementById("job-modal").classList.remove("flex");}
-    async function saveJobModal(){ const job=state.vacantes.find(j=>j.id===activeJobId);if(!job)return; const fields={title:value("modal-title"),company:value("modal-company"),location:value("modal-location"),modality:value("modal-modality"),salary:value("modal-salary"),contact:value("modal-contact"),summary:value("modal-summary"),notes:value("modal-notes"),status:value("modal-status")};Object.assign(job,fields);triggerSave();renderAll();closeJobModal();try{await apiFetch(`/api/empleo/vacancies/${job.id}`,{method:"PATCH",body:JSON.stringify({fields})});toast("Ficha actualizada");}catch(e){if(e.status!==404)toast(errorMessage(e));} }
-    function openJobLink(){ const job=state.vacantes.find(j=>j.id===activeJobId);if(job?.source_url)window.open(job.source_url,"_blank","noopener");else toast("Esta ficha no tiene enlace"); }
-    function prepareCvFromModal(){ const id=activeJobId;closeJobModal();prepareCv(id); }
-    function prepareCv(id){ activeJobId=id;switchView("cv");renderCvVacancyOptions();document.getElementById("cv-vacancy").value=id;selectCvVacancy(id); }
-
-    function renderCvVacancyOptions(){ const select=document.getElementById("cv-vacancy");if(!select)return; select.innerHTML=state.vacantes.length?state.vacantes.map(j=>`<option value="${j.id}" ${j.id===activeJobId?"selected":""}>${esc(j.title)} · ${esc(j.company)}</option>`).join(""):'<option value="">Primero agrega una vacante</option>'; if(!activeJobId&&state.vacantes.length)activeJobId=state.vacantes[0].id; }
-    function selectCvVacancy(id){activeJobId=id||null;const job=state.vacantes.find(j=>j.id===id);if(job?.profile_track)document.getElementById("cv-track").value=job.profile_track;}
-    async function generateCvDraft(){ const job=state.vacantes.find(j=>j.id===(document.getElementById("cv-vacancy").value||activeJobId));if(!job)return toast("Primero agrega una vacante");const button=document.getElementById("generate-cv-button");setLoading(button,true,"Generando borrador");try{const data=await apiFetch("/api/empleo/cv/generate",{method:"POST",body:JSON.stringify({vacancy:job,profile_track:document.getElementById("cv-track").value,language:document.getElementById("cv-language").value})});state.latestGeneration=data.generation;job.status="cv_preparacion";triggerSave();renderDraft(data.generation);renderAll();toast("Borrador listo para revisar");}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,'<i class="ph ph-file-plus"></i> Generar borrador');} }
-    function renderDraft(generation){ if(!generation?.content)return;const c=generation.content;document.getElementById("draft-json").value=JSON.stringify(c,null,2);document.getElementById("draft-status").textContent=`Borrador ${generation.language?.toUpperCase()||""} · perfil ${generation.profile_track||""} · requiere aprobación`;document.getElementById("draft-actions").classList.remove("hidden");document.getElementById("draft-actions").classList.add("flex");document.getElementById("artifact-links").classList.add("hidden");const skills=(c.skills||[]).map(g=>`<p><strong>${esc(g.title)}:</strong> ${esc((g.items||[]).join(" | "))}</p>`).join("");const experience=(c.experience||[]).map(x=>`<h3>${esc(x.role)}<br>${esc(x.organization)}${x.dates?` · ${esc(x.dates)}`:""}</h3><ul>${(x.bullets||[]).map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`).join("");const projects=(c.projects||[]).map(x=>`<h3>${esc(x.name)}</h3><ul>${(x.bullets||[]).map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`).join("");document.getElementById("draft-preview").innerHTML=`<h1>${esc(c.name||"")} | ${esc(c.headline||"")}</h1><p class="contact">${esc([c.location,c.email,c.phone].filter(Boolean).join(" | "))}</p><p class="contact">${esc([c.linkedin,c.github,c.portfolio].filter(Boolean).join(" | "))}</p><p>${esc(c.summary||"")}</p>${skills?`<h2>Habilidades técnicas</h2>${skills}`:""}${experience?`<h2>Experiencia profesional</h2>${experience}`:""}${projects?`<h2>Proyectos relevantes</h2>${projects}`:""}${c.education?.length?`<h2>Educación</h2>${c.education.map(x=>`<p>${esc(x)}</p>`).join("")}`:""}${c.languages?.length?`<h2>Idiomas</h2><p class="contact">${esc(c.languages.join(" | "))}</p>`:""}`; }
-    function setDraftTab(tab){document.getElementById("draft-preview-wrap").classList.toggle("hidden",tab!=="preview");document.getElementById("draft-json").classList.toggle("hidden",tab!=="json");document.getElementById("draft-tab-preview").className=tab==="preview"?"btn-primary rounded-md px-3 py-2 text-sm font-bold":"btn-secondary rounded-md px-3 py-2 text-sm font-semibold";document.getElementById("draft-tab-json").className=tab==="json"?"btn-primary rounded-md px-3 py-2 text-sm font-bold":"btn-secondary rounded-md px-3 py-2 text-sm font-semibold";}
-    async function saveDraft(){if(!state.latestGeneration)return;let content;try{content=JSON.parse(document.getElementById("draft-json").value);}catch(_){return toast("El JSON del borrador no es válido");}try{const data=await apiFetch(`/api/empleo/cv/${state.latestGeneration.id}`,{method:"PATCH",body:JSON.stringify({content})});state.latestGeneration={...state.latestGeneration,...data.generation};triggerSave();renderDraft(state.latestGeneration);toast("Borrador actualizado");}catch(e){toast(errorMessage(e));}}
-    async function approveDraft(){if(!state.latestGeneration)return;await saveDraft();const button=document.getElementById("approve-draft-button");setLoading(button,true,"Creando archivos");try{const data=await apiFetch(`/api/empleo/cv/${state.latestGeneration.id}/approve`,{method:"POST"});state.latestGeneration={...state.latestGeneration,...data.generation};triggerSave();renderArtifacts(data.generation.artifacts);document.getElementById("draft-status").textContent="Aprobado · archivos privados listos";toast("CV y carta creados");}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,'<i class="ph ph-check-circle mr-1"></i> Aprobar y crear archivos');}}
-    function renderArtifacts(artifacts){const labels={cv_pdf:"CV PDF Carta",cv_docx:"CV DOCX editable",letter_pdf:"Carta PDF",letter_docx:"Carta DOCX"};const root=document.getElementById("artifact-links");root.classList.remove("hidden");root.innerHTML=Object.entries(artifacts||{}).map(([key,a])=>`<button onclick="downloadPrivate('${a.url}','${escAttr(a.name)}')" class="btn-secondary flex items-center justify-between rounded-md px-3 py-3 text-left text-sm font-semibold"><span><i class="ph ph-download-simple mr-2 text-sky-300"></i>${labels[key]||key}</span><span class="text-xs text-slate-500">${formatBytes(a.size)}</span></button>`).join("");}
-    async function downloadPrivate(path,name){try{const response=await apiFetch(path);const blob=await response.blob();const url=URL.createObjectURL(blob),anchor=document.createElement("a");anchor.href=url;anchor.download=name;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){toast(errorMessage(e));}}
-
-    async function loadDocuments(){ try{const data=await apiFetch("/api/empleo/documents");documents=data.documents||[];}catch(e){if(e.status!==404)toast(errorMessage(e));}renderDocuments(); }
-    function renderDocuments(){const root=document.getElementById("document-list");if(!root)return;root.innerHTML=documents.length?documents.map(d=>`<div class="panel-muted flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"><div class="min-w-0"><strong class="block truncate text-sm text-white">${esc(d.original_name)}</strong><p class="mt-1 text-xs text-slate-500">${esc(categoryLabel(d.category))} · ${d.language.toUpperCase()} · ${formatBytes(d.size_bytes)} · ${d.extracted_chars||0} caracteres</p></div><div class="flex shrink-0 gap-2"><button onclick="reprocessDocument('${d.id}')" class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Reprocesar"><i class="ph ph-arrows-clockwise"></i></button><button onclick="downloadPrivate('/api/empleo/documents/${d.id}/download','${escAttr(d.original_name)}')" class="btn-secondary flex h-9 w-9 items-center justify-center rounded-md" title="Descargar"><i class="ph ph-download-simple"></i></button><button onclick="toggleDocument('${d.id}','${d.status==='active'?'archived':'active'}')" class="${d.status==='active'?'btn-secondary':'btn-primary'} flex h-9 w-9 items-center justify-center rounded-md" title="${d.status==='active'?'Archivar':'Activar'}"><i class="ph ${d.status==='active'?'ph-archive':'ph-check'}"></i></button></div></div>`).join(""):'<div class="panel-muted p-8 text-center text-sm text-slate-500">La biblioteca todavía está vacía.</div>';renderProfileMetrics();}
-    async function uploadDocument(){const input=document.getElementById("document-file");if(!input.files[0])return toast("Selecciona un documento");const form=new FormData();form.append("file",input.files[0]);form.append("category",document.getElementById("document-category").value);const button=document.getElementById("upload-button");setLoading(button,true,"Procesando documento");try{const data=await apiFetch("/api/empleo/documents",{method:"POST",body:form});toast(data.duplicate?"El documento ya existía":"Documento importado");input.value="";await Promise.all([loadDocuments(),loadProfile()]);}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,'<i class="ph ph-upload-simple"></i> Subir y procesar');}}
-    async function reprocessDocument(id){try{await apiFetch(`/api/empleo/documents/${id}/process`,{method:"POST"});toast("Documento reprocesado");await Promise.all([loadDocuments(),loadProfile()]);}catch(e){toast(errorMessage(e));}}
-    async function toggleDocument(id,status){try{await apiFetch(`/api/empleo/documents/${id}`,{method:"PATCH",body:JSON.stringify({status})});await Promise.all([loadDocuments(),loadProfile()]);toast(status==="active"?"Documento activado":"Documento archivado");}catch(e){toast(errorMessage(e));}}
-    function categoryLabel(value){return ({cv_general:"CV general",cv_data_analyst:"CV Data Analyst",cv_data_scientist:"CV Data Scientist",cv_machine_learning:"CV Machine Learning",plan_busqueda:"Plan de búsqueda",networking:"Networking",linkedin:"LinkedIn",referencia:"Referencia"})[value]||value;}
-
-    let empleoSessionId = sessionStorage.getItem('empleo_chat_session');
-    if (!empleoSessionId) {
-        empleoSessionId = 'empleo_web_' + Math.random().toString(36).substring(2, 11);
-        sessionStorage.setItem('empleo_chat_session', empleoSessionId);
-    }
-    async function callAI(prompt){const data=await apiFetch("/api/orchestrator/chat",{method:"POST",body:JSON.stringify({prompt,app_id:"empleo",session_id:empleoSessionId})});return data.text;}
-    async function generateQuestion(){const button=document.getElementById("question-button");setLoading(button,true,"Generando");try{document.getElementById("question-box").textContent=await callAI(`Genera una sola pregunta difícil y justa para una entrevista de ${value("interview-role")}. Combina criterio técnico, negocio y comunicación.`);}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,"Generar pregunta");}}
-    async function evaluateAnswer(){const answer=value("answer-box");if(!answer)return toast("Escribe tu respuesta");const button=document.getElementById("evaluate-button");setLoading(button,true,"Evaluando");try{document.getElementById("feedback-box").textContent=await callAI(`Evalúa esta respuesta. Devuelve puntuación 1-10, fortalezas, riesgos y una versión STAR mejorada.\nPregunta: ${document.getElementById("question-box").textContent}\nRespuesta: ${answer}`);}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,"Evaluar respuesta");}}
-    function loadNetworkTemplate(){document.getElementById("network-output").value=NETWORK_TEMPLATES[value("network-template")];}
-    async function adaptNetworkMessage(){const button=document.getElementById("network-button");setLoading(button,true,"Adaptando");try{const result=await callAI(`Adapta este mensaje de networking para que suene natural, breve y mexicano, sin presión. Devuelve solo el mensaje final.\nContexto: ${value("network-context")}\nBase: ${value("network-output")}`);document.getElementById("network-output").value=result;state.ultimoMensaje=result;triggerSave();}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,"Adaptar con IA");}}
-    async function saveLog(){const content=value("daily-log");if(!content)return toast("Escribe una entrada");const entry={fecha:new Date().toISOString(),contenido:content};state.bitacoras.unshift(entry);document.getElementById("daily-log").value="";triggerSave();renderLogs();try{await apiFetch("/api/bitacora",{method:"POST",body:JSON.stringify({...entry,app_id:"empleo"})});}catch(_){}toast("Entrada guardada");}
-    async function coachLog(){const text=value("daily-log")||state.bitacoras.slice(0,3).map(x=>x.contenido).join("\n");if(!text)return toast("No hay contenido para analizar");try{const root=document.getElementById("coach-output");root.classList.remove("hidden");root.textContent=await callAI(`Analiza esta bitácora de búsqueda laboral. Indica patrón, bloqueo, prioridad de mañana y una recomendación breve.\n${text}`);}catch(e){toast(errorMessage(e));}}
-    function renderLogs(){const root=document.getElementById("log-history");if(!root)return;root.innerHTML=(state.bitacoras||[]).slice(0,8).map(x=>`<div class="panel-muted p-3"><p class="text-xs text-slate-500">${new Date(x.fecha).toLocaleString("es-MX")}</p><p class="mt-1 whitespace-pre-wrap text-sm text-slate-300">${esc(x.contenido)}</p></div>`).join("")||'<p class="py-8 text-center text-sm text-slate-500">Sin entradas todavía.</p>';}
-
-    function value(id){return document.getElementById(id).value.trim();}
-    function copyFrom(id){navigator.clipboard.writeText(document.getElementById(id).value||document.getElementById(id).textContent);toast("Copiado");}
-    function formatBytes(bytes){if(!bytes)return "0 B";const units=["B","KB","MB"];let i=0,n=Number(bytes);while(n>=1024&&i<units.length-1){n/=1024;i++;}return `${n.toFixed(i?1:0)} ${units[i]}`;}
-    function setLoading(button,loading,label){button.disabled=loading;button.innerHTML=loading?`<i class="ph ph-circle-notch animate-spin"></i> ${label}`:label;}
-    function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[c]);}
-    function escAttr(value){return esc(value).replace(/`/g,"&#096;");}
-    function toast(message){const root=document.getElementById("toast");document.getElementById("toast-text").textContent=message;root.classList.add("toast-show");clearTimeout(root._timer);root._timer=setTimeout(()=>root.classList.remove("toast-show"),2600);}
-    window.addEventListener("resize",()=>{if(window.innerWidth>=1024)toggleMobileMenu(false);});
-    checkLogin();
-  </script>
+  <script src="app.js"></script>
 </body>
+
 </html>
