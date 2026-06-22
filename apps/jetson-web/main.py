@@ -104,6 +104,13 @@ class AIRequest(BaseModel):
     model: Optional[str] = None
 
 
+
+class OrchestratorRequest(BaseModel):
+    prompt: str
+    app_id: str
+    session_id: Optional[str] = None
+    agent_id: Optional[str] = None
+
 class StateRequest(BaseModel):
     state: Dict[str, Any]
 
@@ -1018,6 +1025,49 @@ async def ai_chat(payload: AIRequest, _: None = Depends(require_auth)) -> Dict[s
         1800,
     )
     return {"text": text, "model": model}
+
+
+@app.post("/api/orchestrator/chat")
+async def orchestrator_chat(payload: OrchestratorRequest, _: None = Depends(require_auth)) -> Dict[str, Any]:
+    import asyncio
+    import re
+    
+    cmd = ["/usr/local/bin/picoclaw", "agent", "-m", payload.prompt]
+    if payload.session_id:
+        cmd.extend(["-s", payload.session_id])
+        
+    try:
+        process = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await process.communicate()
+        
+        if process.returncode != 0:
+            return {
+                "text": f"Error de ejecución en PicoClaw: {stderr.decode('utf-8', errors='ignore').strip()}",
+                "model": "picoclaw-error"
+            }
+            
+        raw_text = stdout.decode('utf-8', errors='ignore').strip()
+        
+        if "🦞" in raw_text:
+            base_text = raw_text.split("🦞")[-1].strip()
+        else:
+            base_text = raw_text
+            
+        # Filtrar líneas de logs que contengan marcas de tiempo de Go
+        clean_lines = [
+            line for line in base_text.splitlines()
+            if not re.match(r'^\d{2}:\d{2}:\d{2}\s+(INF|DBG|WRN|ERR)', line.strip())
+        ]
+        clean_text = "\n".join(clean_lines).strip()
+        
+        return {"text": clean_text, "model": "picoclaw-subprocess"}
+        
+    except Exception as e:
+        return {"text": f"Excepción en el servidor FastAPI: {str(e)}", "model": "fastapi-exception"}
 
 
 @app.get("/api/state/{app_id}")

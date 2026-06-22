@@ -1341,13 +1341,20 @@
         // --- SISTEMA IA (JETSON API + OPENROUTER SERVER-SIDE) ---
         const systemPrompt = `Eres el asistente experto de Juan Pablo García Chávez para su doctorado ITM. Eres pragmático, evitas formalismos y saludos largos. Ayudas con PQD complejas, Wavelet, y Edge Computing (SBC). Si pide redactar, proporciona texto limpio sin markdown complejo. Responde siempre en español, usa sistema métrico, cita en IEEE si es necesario.`;
 
+        // Gestión automática y persistente del hilo de conversación
+        let predocSessionId = sessionStorage.getItem('predoctorado_chat_session');
+        if (!predocSessionId) {
+            predocSessionId = 'predoc_web_' + Math.random().toString(36).substring(2, 11);
+            sessionStorage.setItem('predoctorado_chat_session', predocSessionId);
+        }
+
         async function callJetsonAI(prompt, isJson = false) {
             const delays = [1000, 2000, 4000, 8000, 16000];
-            const payload = { prompt, system_prompt: systemPrompt, is_json: isJson };
+            const payload = { prompt, app_id: 'predoctorado', session_id: predocSessionId };
 
             for (let i = 0; i < 5; i++) {
                 try {
-                    const data = await apiFetch('/api/ai/chat', {
+                    const data = await apiFetch('/api/orchestrator/chat', {
                         method: 'POST',
                         body: JSON.stringify(payload)
                     });

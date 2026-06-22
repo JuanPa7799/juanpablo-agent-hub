@@ -365,7 +365,12 @@
     async function toggleDocument(id,status){try{await apiFetch(`/api/empleo/documents/${id}`,{method:"PATCH",body:JSON.stringify({status})});await Promise.all([loadDocuments(),loadProfile()]);toast(status==="active"?"Documento activado":"Documento archivado");}catch(e){toast(errorMessage(e));}}
     function categoryLabel(value){return ({cv_general:"CV general",cv_data_analyst:"CV Data Analyst",cv_data_scientist:"CV Data Scientist",cv_machine_learning:"CV Machine Learning",plan_busqueda:"Plan de búsqueda",networking:"Networking",linkedin:"LinkedIn",referencia:"Referencia"})[value]||value;}
 
-    async function callAI(prompt){const data=await apiFetch("/api/ai/chat",{method:"POST",body:JSON.stringify({prompt,system_prompt:"Eres un coach de empleo Data/ML, claro, humano y riguroso. No inventes informacion.",is_json:false})});return data.text;}
+    let empleoSessionId = sessionStorage.getItem('empleo_chat_session');
+    if (!empleoSessionId) {
+        empleoSessionId = 'empleo_web_' + Math.random().toString(36).substring(2, 11);
+        sessionStorage.setItem('empleo_chat_session', empleoSessionId);
+    }
+    async function callAI(prompt){const data=await apiFetch("/api/orchestrator/chat",{method:"POST",body:JSON.stringify({prompt,app_id:"empleo",session_id:empleoSessionId})});return data.text;}
     async function generateQuestion(){const button=document.getElementById("question-button");setLoading(button,true,"Generando");try{document.getElementById("question-box").textContent=await callAI(`Genera una sola pregunta difícil y justa para una entrevista de ${value("interview-role")}. Combina criterio técnico, negocio y comunicación.`);}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,"Generar pregunta");}}
     async function evaluateAnswer(){const answer=value("answer-box");if(!answer)return toast("Escribe tu respuesta");const button=document.getElementById("evaluate-button");setLoading(button,true,"Evaluando");try{document.getElementById("feedback-box").textContent=await callAI(`Evalúa esta respuesta. Devuelve puntuación 1-10, fortalezas, riesgos y una versión STAR mejorada.\nPregunta: ${document.getElementById("question-box").textContent}\nRespuesta: ${answer}`);}catch(e){toast(errorMessage(e));}finally{setLoading(button,false,"Evaluar respuesta");}}
     function loadNetworkTemplate(){document.getElementById("network-output").value=NETWORK_TEMPLATES[value("network-template")];}
